@@ -1,5 +1,5 @@
 # ПАЛИТРА WX
-# 2024-06-06
+# 08 июн 2024
 
 import random
 import wx

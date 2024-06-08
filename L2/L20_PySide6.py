@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 2024-06-03
+# 08 июн 2024
 
 from pathlib           import Path
 from PySide6           import QtGui

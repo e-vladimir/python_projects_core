@@ -1,5 +1,5 @@
 # РАБОТА С ФАЙЛАМИ
-# 2023-07-24
+# 08 июн 2024
 
 from os      import listdir
 from os.path import isfile, join

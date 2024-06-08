@@ -1,5 +1,5 @@
 # ЛИНЕЙНАЯ МАТЕМАТИКА
-# 2023-01-28
+# 08 июн 2024
 
 def CheckBetween(value_min: int | float, value: int | float, value_max: int | float, flag_include: bool = True) -> bool:
 	""" Проверка вхождения числа в диапазон """

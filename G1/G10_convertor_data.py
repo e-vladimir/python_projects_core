@@ -1,5 +1,5 @@
 # КОНВЕРТОР: ДАННЫЕ
-# 2024-06-06
+# 08 июн 2024
 
 def AmountToString(amount: float | int, flag_point: bool = False, flag_sign: bool = False) -> str:
 	""" Конвертация суммы в строку с разделением триад """
