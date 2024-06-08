@@ -1,5 +1,5 @@
 # КОНВЕРТОР: ФОРМАТЫ
-# 2024-06-06
+# 08 июн 2024
 
 import datetime
 from   typing   import Optional

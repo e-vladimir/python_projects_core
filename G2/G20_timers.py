@@ -1,5 +1,5 @@
 # ТАЙМЕРЫ
-# 2024-05-30
+# 08 июн 2024
 
 import threading
 import time
