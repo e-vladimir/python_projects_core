@@ -14,7 +14,7 @@ class CODES(enum.Enum):
 # 00 - Завершение
 class CODES_COMPLETION(CODES):
 	COMPLETED   = (0, "Завершено")
-	INTERRUPTED = (0, "Прервано")
+	INTERRUPTED = (1, "Прервано")
 
 
 # 01 - Выполнение
@@ -26,16 +26,16 @@ class CODES_PROCESSING(CODES):
 # 02 - Данные
 class CODES_DATA(CODES):
 	NO_DATA       = (2000, "Данные отсутствуют")
-	ERROR_CONVERT = (2001, "Ошибка преобразования данных")
-	ERROR_CHECK   = (2002, "Ошибка проверки или валидации")
-	SINGLE        = (2003, "Данные в единичном экземпляре")
-	NOT_ENOUGH    = (2004, "Данных недостаточно")
+	SINGLE        = (2001, "Данные в единичном экземпляре")
+	NOT_ENOUGH    = (2002, "Данных недостаточно")
+	ERROR_CONVERT = (2003, "Ошибка преобразования данных")
+	ERROR_CHECK   = (2004, "Ошибка проверки или валидации")
 	ERROR_TYPE    = (2005, "Ошибка типа данных")
 
 
 # 03 - СУБД/SQL
 class CODES_DB(CODES):
-	ERROR_CONNECTION = (3000, "Ошибка подключения")
-	NO_CONNECTION    = (3001, "Подключение отсутствует")
+	NO_CONNECTION    = (3000, "Подключение отсутствует")
+	ERROR_CONNECTION = (3001, "Ошибка подключения")
 	ERROR_DB         = (3002, "Ошибка БД")
 	ERROR_SQL        = (3003, "Ошибка SQL")
