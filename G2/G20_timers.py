@@ -1,8 +1,9 @@
 # ТАЙМЕРЫ
-# 08 июн 2024
+# 25 июл 2024
 
 import threading
 import time
+
 from   typing import Callable
 
 
@@ -21,13 +22,19 @@ class C20_ThreatTimer(threading.Thread):
 
 		self.start()
 
-	# Модель данных
+	# Служебные уровни инициализации
 	def Init_00(self):
 		self._lock_processing : bool            = True
 		self._interval_sec    : float           = 1.000
 
 	def Init_10(self):
 		self._target          : Callable | None = None
+
+	# Модель данных
+	pass
+
+	# Модель событий
+	pass
 
 	# Механика данных
 	def IntervalSec(self, value: float = None) -> float:

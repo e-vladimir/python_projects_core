@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 08 июн 2024
+# 25 июл 2024
 
 from pathlib           import Path
 from PySide6           import QtGui
@@ -45,6 +45,7 @@ class C20_PySideApplication(QApplication):
 
 		self.on_Init()
 
+	# Служебные уровни инициализации
 	def Init_00(self):
 		""" Инициализация параметров """
 		self._path_common : Path = Path()
@@ -60,7 +61,22 @@ class C20_PySideApplication(QApplication):
 	def Init_12(self)   : pass
 	def Init_20(self)   : pass
 
-	# СИСТЕМНЫЕ СОБЫТИЯ
+	# Модель данных
+	pass
+
+	# Модель событий
+	pass
+
+	# Механика данных
+	pass
+
+	# Механика управления
+	pass
+
+	# Логика данных
+	pass
+
+	# Логика управления
 	def on_Init(self):
 		""" Событие: При инициализации """
 
@@ -68,7 +84,6 @@ class C20_PySideApplication(QApplication):
 		""" Событие: При запуске приложения """
 		pass
 
-	# СИСТЕМНЫЕ МЕТОДЫ
 	def Start(self):
 		""" Запуск приложения """
 		self.on_Start()
@@ -98,6 +113,7 @@ class C20_PySideForm(QMainWindow):
 
 		self.on_Init()
 
+	# Служебные уровни инициализации
 	def Init_00(self)    : pass
 	def Init_01(self)    : pass
 	def Init_10(self)    : pass
@@ -105,9 +121,16 @@ class C20_PySideForm(QMainWindow):
 	def Init_12(self)    : pass
 	def Init_20(self)    : pass
 
+	# Модель данных
 	def InitMenus(self) : pass
+
+	# Модель событий
 	def InitEvents(self): pass
 
+	# Механика данных
+	pass
+
+	# Механика управления
 	def MoveToCenter(self):
 		""" Центрирование окна на мониторе """
 		shift_width  : int = QApplication.primaryScreen().availableGeometry().width()  - self.width()
@@ -115,7 +138,6 @@ class C20_PySideForm(QMainWindow):
 
 		self.move(shift_width // 2, shift_height // 2)
 
-	# СЛУЖЕБНЫЕ МЕТОДЫ
 	def InitUi(self):
 		""" Инициализация UI для генератора из QtDesigner """
 		pass
@@ -138,15 +160,18 @@ class C20_PySideForm(QMainWindow):
 
 		self.on_Show()
 
-	def UpdateData(self):
-		""" Обновление данных """
-		self.on_UpdateData()
+	# Логика данных
+	pass
 
-	def UpdateDataPartial(self):
-		""" Обновление данных (частичное) """
-		self.on_UpdateDataPartial()
+	# Логика управления
+	def on_Close(self)            : pass
+	def on_Init(self)             : pass
+	def on_Open(self)             : pass
+	def on_Show(self)             : pass
+	def on_UpdateData(self)       : pass
+	def on_UpdateDataPartial(self): pass
+	def on_Resize(self): pass
 
-	# СИСТЕМНЫЕ СОБЫТИЯ
 	def closeEvent(self, event: QtGui.QCloseEvent) -> None:
 		""" Системное событие закрытия формы """
 		self.on_Close()
@@ -159,25 +184,39 @@ class C20_PySideForm(QMainWindow):
 
 		self.on_Resize()
 
-	# СЛУЖЕБНЫЕ СОБЫТИЯ
-	def on_Close(self)            : pass
-	def on_Init(self)             : pass
-	def on_Open(self)             : pass
-	def on_Show(self)             : pass
-	def on_UpdateData(self)       : pass
-	def on_UpdateDataPartial(self): pass
-	def on_Resize(self): pass
+	def UpdateData(self):
+		""" Обновление данных """
+		self.on_UpdateData()
+
+	def UpdateDataPartial(self):
+		""" Обновление данных (частичное) """
+		self.on_UpdateDataPartial()
 
 
 # UI-Компоненты
 class C20_DiaFrame(QWidget):
 	""" UI-компонент диаграмма """
+
+	# Модель данных
+	pass
+
+	# Модель событий
+	pass
+
+	# Механика данных
+	pass
+
+	# Механика управления
 	def DrawBackground(self, painter: QPainter):
 		pass
 
 	def DrawBorder(self, painter: QPainter):
 		pass
 
+	# Логика данных
+	pass
+
+	# Логика управления
 	def paintEvent(self, event):
 		painter = QPainter(self)
 
@@ -431,6 +470,7 @@ def FindIndexFromStandardModelByData(model: QStandardItemModel, text: str, role=
 class C20_StandardItemModel(QStandardItemModel):
 	""" Расширение стандартной модели данных """
 
+	# Модель данных
 	textChanged      = Signal()
 	dataChanged      = Signal()
 
@@ -439,7 +479,14 @@ class C20_StandardItemModel(QStandardItemModel):
 
 	index_processing = QModelIndex()
 
-	# Расширение функций
+	# Модель событий
+	pass
+
+	# Механика данных
+	def removeAll(self):
+		""" Удаление всех данных из модели """
+		self.removeRows(0, self.rowCount())
+
 	def setData(self, index, value, role=None):
 		""" Перезапись служебного метода """
 		self.index_processing = index
@@ -456,12 +503,7 @@ class C20_StandardItemModel(QStandardItemModel):
 
 		return super().setData(index, value, role)
 
-	# Инструментарий
-	def removeAll(self):
-		""" Удаление всех данных из модели """
-		self.removeRows(0, self.rowCount())
-
-	# Инструментарий отображения
+	# Механика управления
 	def setRowColor(self, parent: QStandardItem, row: int, color_bg: QColor = Qt.GlobalColor.white, color_fg: QColor = Qt.GlobalColor.black):
 		""" Установка цвета строки """
 		for index_col in range(self.columnCount()):
@@ -531,7 +573,7 @@ class C20_StandardItemModel(QStandardItemModel):
 					item_model.setBackground(color_bg_top if flag_top else color_bg)
 					item_model.setForeground(color_fg)
 
-	# Выборки данных
+	# Логика данных
 	def indexes(self) -> list[QModelIndex]:
 		""" Список всех индексов в колонке 0 """
 		return IndexesFromStandardModel(self)
@@ -546,6 +588,9 @@ class C20_StandardItemModel(QStandardItemModel):
 		if index_data is None: return None
 
 		return self.itemFromIndex(index_data)
+
+	# Логика управления
+	pass
 
 
 class C20_StandardItem(QStandardItem):
