@@ -7,7 +7,7 @@ import time
 from   typing import Callable
 
 
-class C20_ThreatTimer(threading.Thread):
+class C20_ThreadTimer(threading.Thread):
 	""" Многопоточный таймер """
 
 	def __init__(self, target: Callable, interval_sec: float, flag_enable: bool = False):
