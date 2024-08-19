@@ -1,5 +1,5 @@
 # КАКТУС: СТРУКТУРЫ ДАННЫХ
-# 11 июн 2024
+# 18 авг 2024
 
 import datetime
 from   dataclasses       import (dataclass,
@@ -11,19 +11,19 @@ from   G20_struct_result import T20_StructResult
 @dataclass
 class T21_StructResult_Int(T20_StructResult):
 	""" Структурный результат: Целое число """
-	data: int  = 1
+	data: int = 1
 
 
 @dataclass
 class T21_StructResult_Float(T20_StructResult):
 	""" Структурный результат: Дробное число """
-	data: float  = 0.000
+	data: float = 0.000
 
 
 @dataclass
 class T21_StructResult_String(T20_StructResult):
 	""" Структурный результат: Строка """
-	data: str  = ""
+	data: str = ""
 
 
 @dataclass

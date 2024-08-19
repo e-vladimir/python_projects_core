@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 26 июл 2024
+# 18 авг 2024
 
 from pathlib           import Path
 from PySide6           import QtGui
@@ -546,6 +546,20 @@ class C20_StandardItemModel(QStandardItemModel):
 		if index_data is None: return None
 
 		return self.itemFromIndex(index_data)
+
+	# Инструменты
+	def fastAppendRow(self, label_labels : str | list[str]):
+		""" Быстрое добавление строк """
+		data  : list[str]              = []
+
+		if   type(label_labels) is str : data.append(label_labels)
+		elif type(label_labels) is list: data = label_labels
+
+		items : list[C20_StandardItem] = []
+
+		for label in data: items.append(C20_StandardItem(label))
+
+		self.appendRow(items)
 
 
 class C20_StandardItem(QStandardItem):

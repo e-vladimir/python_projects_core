@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-2
-# 08 июн 2024
+# 18 авг 2024
 
 from pathlib           import Path
 from PySide2           import QtGui
