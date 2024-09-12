@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 18 авг 2024
+# 03 сен 2024
 
 from pathlib           import Path
 from PySide6           import QtGui
@@ -23,10 +23,10 @@ from PySide6.QtWidgets import (QApplication,
                                QDialogButtonBox,
                                QListWidget,
                                QListWidgetItem,
-                               QPlainTextEdit)
+                               QPlainTextEdit, QLineEdit)
 
 
-ROLE_OID : int = 100
+ROLE_IDO : int = 100
 
 
 # ИНСТРУМЕНТАРИЙ ПРИЛОЖЕНИЯ
@@ -73,6 +73,10 @@ class C20_PySideApplication(QApplication):
 		""" Запуск приложения """
 		self.on_Start()
 		self.exec_()
+
+	def Close(self):
+		""" Завершение приложения """
+		self.quit()
 
 
 # ИНСТРУМЕНТАРИЙ ФОРМ
@@ -236,6 +240,44 @@ class QMultipleItemsInputDialog(QDialog):
 		return result
 
 
+class QFindReplaceTextDialog(QDialog):
+	def __init__(self,  title, message, text_find: str = "", text_replace: str = "", parent=None):
+		super().__init__(parent)
+
+		self.setMinimumWidth(480)
+
+		self.setWindowTitle(title)
+
+		layout_form       = QFormLayout(self)
+		layout_form.addRow(QLabel(message))
+
+		self.edit_find    = QLineEdit()
+		self.edit_find.setText(text_find)
+
+		self.edit_replace = QLineEdit()
+		self.edit_replace.setText(text_replace)
+
+		layout_form.addRow(QLabel("Фрагмент поиска"))
+		layout_form.addRow(self.edit_find)
+
+		layout_form.addRow(QLabel("Фрагмент замены"))
+		layout_form.addRow(self.edit_replace)
+
+		btn_box           = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
+		layout_form.addRow(btn_box)
+
+		btn_box.accepted.connect(self.accept)
+		btn_box.rejected.connect(self.reject)
+
+	def textFind(self) -> str:
+		""" Фрагмент поиска """
+		return self.edit_find.text()
+
+	def textReplace(self) -> str:
+		""" Фрагмент замены """
+		return self.edit_replace.text()
+
+
 class QMultipleTextInputDialog(QDialog):
 	def __init__(self,  title, message, items: list[any], parent=None):
 		super().__init__(parent)
@@ -258,17 +300,21 @@ class QMultipleTextInputDialog(QDialog):
 		btn_box.rejected.connect(self.reject)
 
 	def textValues(self) -> list[str]:
-		"""  """
+		""" Список строк  """
 		return self.edit_text.toPlainText().split('\n')
 
 
-def RequestText(title: str, message: str, old_text: str = "") -> None | str:
+def RequestText(title: str, message: str, old_text: str = "", items: list[str] | None = None) -> None | str:
 	""" Запрос текста """
 	dialog = QInputDialog(None)
 	dialog.setWindowTitle(title)
 	dialog.setLabelText(message)
 	dialog.resize(480, 150)
 	dialog.setTextValue(old_text)
+
+	if items is not None:
+		dialog.setComboBoxItems(items)
+		dialog.setComboBoxEditable(True)
 
 	if not dialog.exec_(): return None
 	return dialog.textValue()
@@ -471,6 +517,15 @@ class C20_StandardItemModel(QStandardItemModel):
 			item_child.setBackground(color_bg)
 			item_child.setForeground(color_fg)
 
+	def setColColor(self, parent: QStandardItem, col: int, color_bg: QColor = Qt.GlobalColor.white, color_fg: QColor = Qt.GlobalColor.black):
+		""" Установка цвета колонки """
+		for index_row in range(self.rowCount()):
+			item_child : QStandardItem | None = parent.child(index_row, col)
+			if item_child is None: continue
+
+			item_child.setBackground(color_bg)
+			item_child.setForeground(color_fg)
+
 	def setCellColor(self, parent: QStandardItem, row: int, col: int, color_bg: QColor = Qt.GlobalColor.white, color_fg: QColor = Qt.GlobalColor.black):
 		""" Установка цвета ячейки """
 		item_child: QStandardItem | None = parent.child(row, col)
@@ -536,7 +591,7 @@ class C20_StandardItemModel(QStandardItemModel):
 		""" Список всех индексов в колонке 0 """
 		return IndexesFromStandardModel(self)
 
-	def indexByData(self, text: str, role=Qt.ItemDataRole.DisplayRole) -> QModelIndex | None:
+	def indexByData(self, text: str, role = Qt.ItemDataRole.DisplayRole) -> QModelIndex | None:
 		""" Поиск индекса по данным """
 		return FindIndexFromStandardModelByData(self, text, role)
 
@@ -546,6 +601,19 @@ class C20_StandardItemModel(QStandardItemModel):
 		if index_data is None: return None
 
 		return self.itemFromIndex(index_data)
+
+	def dataByCheckState(self, role = Qt.ItemDataRole.DisplayRole, check_state = Qt.CheckState.Checked) -> list:
+		""" Выборка данных для выбранных элементов """
+		result = []
+
+		for index_data in self.indexes():
+			item_data = self.itemFromIndex(index_data)
+
+			if not item_data.checkState() == check_state: continue
+
+			result.append(item_data.data(role))
+
+		return result
 
 	# Инструменты
 	def fastAppendRow(self, label_labels : str | list[str]):
@@ -563,7 +631,7 @@ class C20_StandardItemModel(QStandardItemModel):
 
 
 class C20_StandardItem(QStandardItem):
-	def __init__(self, title: str, data = "", data_role : int = ROLE_OID, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
+	def __init__(self, title: str, data = "", data_role : int = ROLE_IDO, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
 		"""  """
 		super().__init__()
 
