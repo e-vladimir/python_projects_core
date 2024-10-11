@@ -1,32 +1,53 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 03 сен 2024
+# 29 сен 2024
 
-from pathlib           import Path
-from PySide6           import QtGui
-from PySide6.QtCore    import (Qt,
-                               QModelIndex,
-                               Signal)
-from PySide6.QtGui     import (QStandardItemModel,
-                               QStandardItem,
-                               QPainter,
-                               QColor,
-                               QFont)
-from PySide6.QtWidgets import (QApplication,
-                               QFileDialog,
-                               QInputDialog,
-                               QMainWindow,
-                               QMessageBox,
-                               QWidget,
-                               QDialog,
-                               QFormLayout,
-                               QLabel,
-                               QDialogButtonBox,
-                               QListWidget,
-                               QListWidgetItem,
-                               QPlainTextEdit, QLineEdit)
+import enum
+
+from   pathlib           import Path
+from   PySide6           import QtGui
+from   PySide6.QtCore    import (Qt,
+                                 QModelIndex,
+                                 Signal)
+from   PySide6.QtGui     import (QStandardItemModel,
+                                 QStandardItem,
+                                 QPainter,
+                                 QColor,
+                                 QFont)
+from   PySide6.QtWidgets import (QApplication,
+	                             QFileDialog,
+	                             QInputDialog,
+	                             QMainWindow,
+	                             QMessageBox,
+	                             QWidget,
+	                             QDialog,
+	                             QFormLayout,
+	                             QLabel,
+	                             QDialogButtonBox,
+	                             QListWidget,
+	                             QListWidgetItem,
+	                             QPlainTextEdit, QLineEdit)
 
 
-ROLE_IDO : int = 100
+class ROLES(enum.IntEnum):
+	ROLE_IDO               = 100
+	ROLE_VISUAL_STYLE_CELL = 200
+	ROLE_VISUAL_STYLE_ROW  = 201
+
+
+class VISUAL_STYLE(enum.StrEnum):
+	H1        = "H1"
+	H2        = "H2"
+	H3        = "H3"
+
+	SEPARATOR = "SEP"
+
+	BOLD      = "B"
+	UNDERLINE = "U"
+	ITALIC    = "I"
+
+	ALIGN_R   = "R"
+	ALIGN_L   = "L"
+	ALIGN_C   = "C"
 
 
 # ИНСТРУМЕНТАРИЙ ПРИЛОЖЕНИЯ
@@ -203,7 +224,7 @@ def ShowMessage(title: str, message: str, description: str = ""):
 
 # ИНСТРУМЕНТАРИЙ ЗАПРОСОВ
 class QMultipleItemsInputDialog(QDialog):
-	def __init__(self,  title, message, items: list[any], parent=None):
+	def __init__(self,  title, message, items: list[str], parent=None, items_checked: list[str] = []):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -216,7 +237,7 @@ class QMultipleItemsInputDialog(QDialog):
 		for item in items:
 			item_text = QListWidgetItem()
 			item_text.setText(item)
-			item_text.setCheckState(Qt.CheckState.Unchecked)
+			item_text.setCheckState(Qt.CheckState.Unchecked if item not in items_checked else Qt.CheckState.Checked)
 
 			self.list_items.addItem(item_text)
 
@@ -373,7 +394,9 @@ def RequestItem(title: str, message: str, items: list[str]) -> str | None:
 	max_length : int = max(list(map(len, items)))
 
 	size_w     : int = min(480, max_length * 15)
-	size_h     : int = min(640, len(items) * 55)
+	size_w           = max(360, size_w)
+	size_h     : int = min(640, len(items) * 40)
+	size_h           = max(240, size_h)
 
 	dialog_items.resize(size_w, size_h)
 
@@ -382,15 +405,17 @@ def RequestItem(title: str, message: str, items: list[str]) -> str | None:
 	return dialog_items.textValue()
 
 
-def RequestItems(title: str, message: str, items: list[str]) -> list[str] | None:
+def RequestItems(title: str, message: str, items: list[str], items_checked: list[str] = []) -> list[str] | None:
 	""" Запрос значений из списка """
 	if not items               : return None
 	
 	max_length : int = max(list(map(len, items)))
 	size_w     : int = min(480, max_length * 15)
+	size_w           = max(360, size_w)
 	size_h     : int = min(640, len(items) * 55)
+	size_h           = max(240, size_h)
 
-	dialog_items     = QMultipleItemsInputDialog(title, message, items)
+	dialog_items     = QMultipleItemsInputDialog(title, message, items, items_checked=items_checked)
 	dialog_items.resize(size_w, size_h)
 
 	if not dialog_items.exec_(): return None
@@ -629,9 +654,16 @@ class C20_StandardItemModel(QStandardItemModel):
 
 		self.appendRow(items)
 
+	def fastAppendLabels(self, labels: list[str], col_count: int = 2):
+		""" Быстрое создание таблицы """
+		for label in labels:
+			data = [label] + [""] * col_count
+
+			self.fastAppendRow(data)
+
 
 class C20_StandardItem(QStandardItem):
-	def __init__(self, title: str, data = "", data_role : int = ROLE_IDO, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
+	def __init__(self, title: str, data = "", data_role : int | ROLES = ROLES.ROLE_IDO, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
 		"""  """
 		super().__init__()
 
