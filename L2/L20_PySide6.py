@@ -1,5 +1,5 @@
-# ПАКЕТ ДЛЯ РАБОТЫ С PySide-6
-# 29 сен 2024
+# ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
+# 12 ноя 2024
 
 import enum
 
@@ -29,9 +29,13 @@ from   PySide6.QtWidgets import (QApplication,
 
 
 class ROLES(enum.IntEnum):
-	ROLE_IDO               = 100
-	ROLE_VISUAL_STYLE_CELL = 200
-	ROLE_VISUAL_STYLE_ROW  = 201
+	TEXT              = Qt.ItemDataRole.DisplayRole
+	IDO               = 100
+	FILENAME          = 101
+	GROUP             = 102
+	VISUAL_STYLE_CELL = 200
+	VISUAL_STYLE_ROW  = 201
+	SORT_INDEX        = 300
 
 
 class VISUAL_STYLE(enum.StrEnum):
@@ -196,7 +200,7 @@ class C20_PySideForm(QMainWindow):
 
 # UI-Компоненты
 class C20_DiaFrame(QWidget):
-	""" UI-компонент диаграмма """
+	""" UI-компонент область отрисовки """
 	def DrawBackground(self, painter: QPainter):
 		pass
 
@@ -249,7 +253,7 @@ class QMultipleItemsInputDialog(QDialog):
 		btn_box.accepted.connect(self.accept)
 		btn_box.rejected.connect(self.reject)
 
-	def itemsSelected(self) -> list[str]:
+	def selectedItems(self) -> list[str]:
 		result : list[str] = []
 
 		for index_row in range(self.list_items.count()):
@@ -366,6 +370,7 @@ def RequestValue(title: str, message: str, value_old: int | float = None, value_
 	elif type(value_old) is float: dialog.setDoubleValue(value_old)
 
 	if not dialog.exec_(): return None
+
 	if   type(value_old) is int  : return dialog.intValue()
 	elif type(value_old) is float: return dialog.doubleValue()
 
@@ -420,7 +425,7 @@ def RequestItems(title: str, message: str, items: list[str], items_checked: list
 
 	if not dialog_items.exec_(): return None
 
-	return dialog_items.itemsSelected()
+	return dialog_items.selectedItems()
 
 
 def RequestFilepath(title: str, filename: str = "", filters: str = "") -> Path | None:
@@ -532,6 +537,10 @@ class C20_StandardItemModel(QStandardItemModel):
 		""" Удаление всех данных из модели """
 		self.removeRows(0, self.rowCount())
 
+	def checkIdo(self, ido: str) -> bool:
+		""" Проверка наличия данных с указанным IDO """
+		return self.indexByData(ido, ROLES.IDO) is not None
+
 	# Инструментарий отображения
 	def setRowColor(self, parent: QStandardItem, row: int, color_bg: QColor = Qt.GlobalColor.white, color_fg: QColor = Qt.GlobalColor.black):
 		""" Установка цвета строки """
@@ -570,7 +579,7 @@ class C20_StandardItemModel(QStandardItemModel):
 
 			item_child.setFont(font_item)
 
-	def setGroupsView(self, flag_only_top: bool = True, flag_setup_h: bool = True, flag_apply_bg: bool = False):
+	def adjustGroupView(self, flag_only_top: bool = True, flag_setup_h: bool = True, flag_apply_bg: bool = False):
 		""" Настройка отображения групп """
 		color_bg_top = QColor(220, 220, 220)
 		color_bg     = QColor(235, 235, 235)
@@ -616,18 +625,18 @@ class C20_StandardItemModel(QStandardItemModel):
 		""" Список всех индексов в колонке 0 """
 		return IndexesFromStandardModel(self)
 
-	def indexByData(self, text: str, role = Qt.ItemDataRole.DisplayRole) -> QModelIndex | None:
+	def indexByData(self, text: str, role : Qt.ItemDataRole | ROLES = Qt.ItemDataRole.DisplayRole) -> QModelIndex | None:
 		""" Поиск индекса по данным """
 		return FindIndexFromStandardModelByData(self, text, role)
 
-	def itemByData(self, text: str, role = Qt.ItemDataRole.DisplayRole) -> QStandardItem | None:
+	def itemByData(self, text: str, role : Qt.ItemDataRole | ROLES = Qt.ItemDataRole.DisplayRole) -> QStandardItem | None:
 		""" Поиск элемента по данным """
 		index_data = self.indexByData(text, role)
 		if index_data is None: return None
 
 		return self.itemFromIndex(index_data)
 
-	def dataByCheckState(self, role = Qt.ItemDataRole.DisplayRole, check_state = Qt.CheckState.Checked) -> list:
+	def dataByCheckState(self, role : Qt.ItemDataRole | ROLES = Qt.ItemDataRole.DisplayRole, check_state = Qt.CheckState.Checked) -> list:
 		""" Выборка данных для выбранных элементов """
 		result = []
 
@@ -637,6 +646,20 @@ class C20_StandardItemModel(QStandardItemModel):
 			if not item_data.checkState() == check_state: continue
 
 			result.append(item_data.data(role))
+
+		return result
+
+	def indexesInRowByIdo(self, ido: str) -> list[QModelIndex]:
+		""" Индексы в строке с указанным IDO """
+		result       : list[QModelIndex]  = []
+
+		index_row    : QModelIndex | None = self.indexByData(ido, ROLES.IDO)
+		if index_row is None: return result
+
+		index_parent : QModelIndex        = index_row.parent()
+
+		for index_col in range(self.columnCount()):
+			result.append(self.index(index_row.row(), index_col, index_parent))
 
 		return result
 
@@ -663,7 +686,7 @@ class C20_StandardItemModel(QStandardItemModel):
 
 
 class C20_StandardItem(QStandardItem):
-	def __init__(self, title: str, data = "", data_role : int | ROLES = ROLES.ROLE_IDO, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
+	def __init__(self, title: str, data = "", data_role : int | ROLES = ROLES.IDO, flag_align_right : bool = False, flag_bold: bool = False, flag_checked : bool = None):
 		"""  """
 		super().__init__()
 
