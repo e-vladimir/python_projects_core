@@ -1,17 +1,14 @@
 # ГЕНЕРАТОР ОТЧЁТОВ НА БАЗЕ FPDF
-# 30 дек 2024
+# 31 дек 2024
 
 import enum
 
 from   dataclasses import dataclass
 from   datetime    import datetime
 from   pathlib     import Path
-from pprint import pprint
-
-from fpdf import Align, FPDF, FontFace
-from fpdf.enums import CellBordersLayout, TableBordersLayout, VAlign
-from fpdf.table import Row
-from wx.lib.sized_controls import border
+from   fpdf        import Align, FPDF
+from   fpdf.enums  import TableBordersLayout, VAlign
+from   fpdf.table  import Row
 
 
 class BLOCKS(enum.Enum):
