@@ -17,8 +17,9 @@ code = """<dependencies>
 </dependencies>"""
 
 report = C30_ProcessorReportsFpdf2()
-report._info_document.title = "Тестовый документ"
-report._info_document.edition = random.randint(100, 1000000)
+report.info_document.title = "Тестовый документ"
+report.info_document.subtitle = "Испытания генерации"
+report.info_document.edition = random.randint(100, 10000)
 report.LoadFonts(Path("./L0/fonts"))
 report.NewPage()
 report.AppendText(h1   = "Logback",

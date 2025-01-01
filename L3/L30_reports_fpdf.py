@@ -1,13 +1,13 @@
 # ГЕНЕРАТОР ОТЧЁТОВ НА БАЗЕ FPDF
-# 31 дек 2024
+# 01 янв 2025
 
 import enum
 
 from   dataclasses import dataclass
 from   datetime    import datetime
 from   pathlib     import Path
-from fpdf import Align, FPDF, FontFace
-from fpdf.enums import CellBordersLayout, TableBordersLayout, VAlign
+from fpdf import Align, FPDF, FontFace, XPos, YPos
+from   fpdf.enums  import CellBordersLayout, TableBordersLayout, VAlign
 from   fpdf.table  import Row
 
 
@@ -41,6 +41,7 @@ class T30_Margins:
 @dataclass
 class T30_InformationDocument:
 	title   : str      = ""
+	subtitle: str      = ""
 	author  : str      = ""
 	edition : int      = 1
 	date    : datetime = datetime.now()
@@ -79,18 +80,21 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		super().__init__(unit="mm", format="A4")
 
 		self.Init_00()
+		self.Init_10()
 
 	# Модель данных
 	def Init_00(self):
-		self._margins_page  : T30_Margins             = T30_Margins(30, 15, 15, 15)
-		self._info_document : T30_InformationDocument = T30_InformationDocument()
-
 		self._processing_h1 : str                     = ""
 		self._processing_h2 : str                     = ""
 		self._processing_h3 : str                     = ""
 
+	def Init_10(self):
+		self.margins_page   : T30_Margins             = T30_Margins(30, 15, 15, 15)
+		self.info_document  : T30_InformationDocument = T30_InformationDocument()
+
 	# Модель событий
-	pass
+	def header(self): self.AppendHeader()
+	def footer(self): self.AppendFooter()
 
 	# Механика данных
 	def SwitchColors(self, block: BLOCKS):
@@ -113,6 +117,11 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 			case BLOCKS.TEXT:
 				self.set_text_color(  0)
+				self.set_draw_color(200)
+				self.set_fill_color(255)
+
+			case BLOCKS.HEADER:
+				self.set_text_color(150)
 				self.set_draw_color(200)
 				self.set_fill_color(255)
 
@@ -141,6 +150,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 			case BLOCKS.CODE       : self.set_font("Mono",  "",  8)
 			case BLOCKS.DESCRIPTION: self.set_font("Sans", "I",  8)
 			case BLOCKS.TABLE      : self.set_font("Mono",  "",  8)
+			case BLOCKS.HEADER     : self.set_font("Sans",  "",  8)
 
 	# Механика управления: Шрифты
 	def LoadFonts(self, path_fonts: Path):
@@ -159,8 +169,8 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.add_page(orientation = "L" if flag_rotate else "P",
 		              format      = format_page.value)
 
-		self.set_margins(self._margins_page.l, self._margins_page.t, self._margins_page.r)
-		self.set_auto_page_break(True, self._margins_page.b)
+		self.set_margins(self.margins_page.l, self.margins_page.t, self.margins_page.r)
+		self.set_auto_page_break(True, self.margins_page.b)
 
 	# Механика управления: Блоки
 	def AppendH1(self, h1: str = ""):
@@ -175,7 +185,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.SwitchFont(BLOCKS.H1)
 		self.SwitchColors(BLOCKS.H1)
 
-		self.set_x(self._margins_page.l)
+		self.set_x(self.margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
@@ -193,7 +203,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.SwitchFont(BLOCKS.H2)
 		self.SwitchColors(BLOCKS.H2)
 
-		self.set_x(self._margins_page.l)
+		self.set_x(self.margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
@@ -211,7 +221,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.SwitchFont(BLOCKS.H3)
 		self.SwitchColors(BLOCKS.H3)
 
-		self.set_x(self._margins_page.l)
+		self.set_x(self.margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
@@ -230,7 +240,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.ln(5)
 
-		self.set_x(self._margins_page.l)
+		self.set_x(self.margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
@@ -245,7 +255,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.ln(2)
 
-		self.set_x(self._margins_page.l)
+		self.set_x(self.margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
@@ -263,7 +273,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		for idx, item in enumerate(items):
 			marker: str = f'{idx + 1}.' if flag_numeric else '•'
 
-			self.set_x(self._margins_page.l + 5)
+			self.set_x(self.margins_page.l + 5)
 			self.multi_cell(w        = 0.00,
 			                align    = Align.J,
 			                text     = f"{marker} {item}")
@@ -312,6 +322,65 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 				for data_cell in data_row:
 					row.cell(data_cell)
+
+	def AppendHeader(self):
+		""" Размещение колонтитула верхнего """
+		if not self.info_document.title: return
+
+		self.set_auto_page_break(False)
+
+		self.SwitchFont(BLOCKS.HEADER)
+		self.SwitchColors(BLOCKS.HEADER)
+
+		shift_w : int = 70
+		shift_y : int =  5
+
+		self.set_xy(self.margins_page.l, shift_y)
+		self.cell(w     = self.w - shift_w - self.margins_page.l,
+		          text  = f"{self.info_document.title}",
+		          align = Align.L,
+		          new_x = XPos.START,
+		          new_y = YPos.TOP)
+
+		self.set_xy(self.w - self.margins_page.r - shift_w, shift_y)
+		self.cell(w     = shift_w,
+		          text  = f"ред. {self.info_document.edition} от {self.info_document.date:%d/%m/%Y}",
+		          align = Align.R,
+		          new_x = XPos.START,
+		          new_y = YPos.TOP)
+
+		self.line(self.margins_page.l, shift_y + 4, self.w - self.margins_page.r, shift_y + 4)
+
+		self.set_auto_page_break(True, self.margins_page.b)
+		self.set_xy(self.margins_page.l, self.margins_page.t)
+
+	def AppendFooter(self):
+		""" Размещение колонтитула нижнего """
+		shift_w : int = 70
+		shift_y : int =  4
+
+		self.set_auto_page_break(False)
+
+		self.SwitchFont(BLOCKS.HEADER)
+		self.SwitchColors(BLOCKS.HEADER)
+
+		self.set_xy(self.margins_page.l, self.h - shift_y - 3)
+		self.cell(w     = self.w - shift_w - self.margins_page.l,
+		          text  = f"{self.info_document.subtitle}",
+		          align = Align.L,
+		          new_x = XPos.START,
+		          new_y = YPos.TOP)
+
+		self.set_xy(self.w - self.margins_page.r - shift_w, self.h - shift_y - 3)
+		self.cell(w     = shift_w,
+		          text  = f"стр. {self.page_no()}",
+		          align = Align.R,
+		          new_x = XPos.START,
+		          new_y = YPos.TOP)
+
+		self.line(self.margins_page.l, self.h - shift_y - 4, self.w - self.margins_page.r, self.h - shift_y - 4)
+
+		self.set_auto_page_break(True, self.margins_page.b)
 
 	# Логика данных
 	def SaveToPdf(self, file_path: Path):
