@@ -6,8 +6,8 @@ import enum
 from   dataclasses import dataclass
 from   datetime    import datetime
 from   pathlib     import Path
-from   fpdf        import Align, FPDF
-from   fpdf.enums  import TableBordersLayout, VAlign
+from fpdf import Align, FPDF, FontFace
+from fpdf.enums import CellBordersLayout, TableBordersLayout, VAlign
 from   fpdf.table  import Row
 
 
@@ -168,6 +168,8 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		if not h1                       : return
 		if     h1 == self._processing_h1: return
 
+		self.ln(10)
+
 		self._processing_h1 = h1
 
 		self.SwitchFont(BLOCKS.H1)
@@ -178,8 +180,6 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
 		                text  = h1.upper())
-
-		self.ln(5)
 
 	def AppendH2(self, h2: str = ""):
 		""" Добавление заголовка 2 """
@@ -199,12 +199,12 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		                align = Align.J,
 		                text  = h2.upper())
 
-		self.ln(5)
-
 	def AppendH3(self, h3: str = ""):
 		""" Добавление заголовка 3 """
 		if not h3                       : return
 		if     h3 == self._processing_h3: return
+
+		self.ln(5)
 
 		self._processing_h3 = h3
 
@@ -217,8 +217,6 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		                align = Align.J,
 		                text  = h3.upper())
 
-		self.ln(2)
-
 	def AppendText(self, h1: str = "", h2: str = "", h3: str = "", text: str | list[str] = ""):
 		""" Добавление текста """
 		if not text: return
@@ -230,13 +228,13 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		self.SwitchFont(BLOCKS.TEXT)
 		self.SwitchColors(BLOCKS.TEXT)
 
+		self.ln(5)
+
 		self.set_x(self._margins_page.l)
 
 		self.multi_cell(w     = 0.00,
 		                align = Align.J,
 		                text  = text if type(text) is str else '\n\n'.join(text))
-
-		self.ln(5)
 
 	def AppendCode(self, code: str | list[str] = ""):
 		""" Добавление кода """
@@ -244,6 +242,8 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.SwitchFont(BLOCKS.CODE)
 		self.SwitchColors(BLOCKS.CODE)
+
+		self.ln(2)
 
 		self.set_x(self._margins_page.l)
 
@@ -253,12 +253,12 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		                fill  = True,
 		                padding=2)
 
-		self.ln(5)
-
 	def AppendList(self, items: list[str], flag_numeric: bool = False):
 		""" Добавление списка """
 		self.SwitchFont(BLOCKS.TEXT)
 		self.SwitchColors(BLOCKS.TEXT)
+
+		self.ln(2)
 
 		for idx, item in enumerate(items):
 			marker: str = f'{idx + 1}.' if flag_numeric else '•'
@@ -269,12 +269,12 @@ class C30_ProcessorReportsFpdf2(FPDF):
 			                text     = f"{marker} {item}")
 			self.ln(2)
 
-		self.ln()
-
 	def AppendTable(self, description: str = "", header: list[str] = [], data: list = [], sizes: list[int] = [], aligns: list[Align] = []):
 		""" Добавление таблицы """
 		if not header: return
 		if not data  : return
+
+		self.ln(5)
 
 		column_sizes  : list[float] = [(self.epw - sum(sizes)) / (len(header) - len(sizes))] * len(header)
 		column_aligns : list[Align] = [Align.L] * len(header)
@@ -287,27 +287,31 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.multi_cell(w     = 0.00,
 		                text  = description,
-		                align = Align.R)
+		                align = Align.R,)
 
 		self.SwitchFont(BLOCKS.TABLE)
 		self.SwitchColors(BLOCKS.TABLE)
 
-		with self.table(borders_layout  = TableBordersLayout.SINGLE_TOP_LINE,
-		                col_widths      = column_sizes,
+		self.ln(2)
+
+		style_header = FontFace(color      =   0,
+		                        fill_color = 230,
+		                        emphasis   = "B")
+
+		with self.table(headings_style  = style_header,
+						col_widths      = column_sizes,
 		                text_align      = column_aligns,
 		                repeat_headings = True,
 		                line_height     = self.font_size * 1.25,
 		                padding         = 1,
 		                align           = Align.R,
-		                v_align         = VAlign.T) as table:
-			for data_row in [header] + data:
+		                v_align         = VAlign.T,
+		                borders_layout  = TableBordersLayout.HORIZONTAL_LINES) as table:
+			for idx_row, data_row in enumerate([header] + data):
 				row : Row = table.row()
 
 				for data_cell in data_row:
-					row.cell(text   = data_cell,
-					         border = "BOTTOM")
-
-		self.ln(5)
+					row.cell(data_cell)
 
 	# Логика данных
 	def SaveToPdf(self, file_path: Path):
