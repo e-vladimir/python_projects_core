@@ -45,7 +45,6 @@ MONTHS = ["",
 baseclass   : str  = "C20_MetaFrame"    # Корневое/Родительское имя класса
 classname   : str  = "ClassName"        # Имя класса
 description : str  = "Описание класса"  # Описание класса
-filename    : str  = "test_class"       # Имя файла
 flag_item   : bool = True               # Наличие элемента класса
 flag_single : bool = False              # Упаковка в едином классе
 
@@ -142,7 +141,14 @@ for L in [LS.L4, LS.L5, LS.L6, LS.L7, LS.L8, LS.L9]:
 	with open(filepath, "w") as file:
 		data : list[str] = [f"# {description.upper()}: {L.description.upper()}",
 		                    f"# {dd:02d} {MONTHS[dm].upper()} {dy}",
-		                    f""]
+		                    f""
+		                    ]
+
+		if L.level > 40: data.extend([
+							f"from L{L.level-10:02d}_{classname.lower()} import C{L.level - 10:02d}_{classname}{f", C{L.level-10:02d}_{classname}Item" if flag_item else ""}",
+							"\n"
+							])
+
 
 		if flag_item: data.extend([
 							f"class C{L.level:02d}_{classname}Item({baseclass if L.level == 40 else f"C{L.level-10:02d}_{classname}Item"}):",
