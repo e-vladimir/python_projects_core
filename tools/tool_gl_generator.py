@@ -131,10 +131,10 @@ if flag_single:
 
 for L in [LS.L4, LS.L5, LS.L6, LS.L7, LS.L8, LS.L9]:
 	filename = f"L{L.level:02d}_{classname.lower()}.py"
-	filedir  = Path(f"./L{L.level}")
+	filedir  = Path(f"./L{L.level//10}")
 	if not filedir.exists(): mkdir(filedir)
 
-	filepath = Path(f"./L{L.level}/{filename}")
+	filepath = Path(f"./L{L.level//10}/{filename}")
 	if filepath.exists():
 		print(f"{filename}: Файл существует, пропуск.")
 		continue
