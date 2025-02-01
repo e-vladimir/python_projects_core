@@ -65,11 +65,12 @@ if flag_single:
 	with open(filepath, "w") as file:
 		data : list[str] = [f"# {description.upper()}",
 		                    f"# {dd:02d} {MONTHS[dm].upper()} {dy}",
+		                    f"\n"]
+
+		if flag_item: data.extend([
+		                    f"class C{classname}Item({baseclass}):",
+		                    f"\t\"\"\"{description}.Элемент\"\"\"",
 		                    f"",
-		                    f"class C{classname}({baseclass}):",
-		                    f"\t\"\"\"{description}\"\"\"",
-		                    f"",
-		                    f""
 		                    f"\t# {LS.L4.description}",
 		                    f"\tpass"
 		                    f"\n"
@@ -92,9 +93,36 @@ if flag_single:
 		                    f"\n"
 		                    f"\t# {LS.L9.description}",
 		                    f"\tpass"
-		                    ]
+		                    f"\n"
+		                    f"\n"
+		                    ])
 
-		print('\n'.join(data))
+		data.extend([		f"class C{classname}({baseclass}):",
+		                    f"\t\"\"\"{description}\"\"\"",
+		                    f"",
+		                    f"\t# {LS.L4.description}",
+		                    f"\tpass"
+		                    f"\n"
+		                    f"\n"
+		                    f"\t# {LS.L5.description}",
+		                    f"\tpass"
+		                    f"\n"
+		                    f"\n"
+		                    f"\t# {LS.L6.description}",
+		                    f"\tpass"
+		                    f"\n"
+		                    f"\n"
+		                    f"\t# {LS.L7.description}",
+		                    f"\tpass"
+		                    f"\n"
+		                    f"\n"
+		                    f"\t# {LS.L8.description}",
+		                    f"\tpass"
+		                    f"\n"
+		                    f"\n"
+		                    f"\t# {LS.L9.description}",
+		                    f"\tpass"
+		                    ])
 
 		file.write('\n'.join(data))
 		print(f"{filename}: Генерация файла завершена.")
@@ -114,12 +142,21 @@ for L in [LS.L4, LS.L5, LS.L6, LS.L7, LS.L8, LS.L9]:
 	with open(filepath, "w") as file:
 		data : list[str] = [f"# {description.upper()}: {L.description.upper()}",
 		                    f"# {dd:02d} {MONTHS[dm].upper()} {dy}",
-		                    f"",
-		                    f"class C{L.level:02d}_{classname}({baseclass if L.level == 40 else f"C{L.level-10:02d}_{classname}"}):",
-		                    f"\t\"\"\"{description}: {L.description} \"\"\"",
+		                    f""]
+
+		if flag_item: data.extend([
+							f"class C{L.level:02d}_{classname}Item({baseclass if L.level == 40 else f"C{L.level-10:02d}_{classname}Item"}):",
+		                    f"\t\"\"\"{description}.Элемент: {L.description} \"\"\"",
 		                    f"\n"
-		                    f"\tpass"
-		                    ]
+		                    f"\tpass",
+							f"\n"
+		                    ])
+
+		data.extend([       f"class C{L.level:02d}_{classname}({baseclass if L.level == 40 else f"C{L.level - 10:02d}_{classname}"}):",
+							f"\t\"\"\"{description}: {L.description} \"\"\"",
+							f"\n"
+							f"\tpass"
+		])
 
 		file.write('\n'.join(data))
 		print(f"{filename}: Генерация файла завершена.")
