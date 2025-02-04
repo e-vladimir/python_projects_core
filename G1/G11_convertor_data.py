@@ -1,15 +1,17 @@
 # КОНВЕРТОР: ДАННЫЕ
-# 18 авг 2024
+# 03 фев 2025
 
 import datetime
 
 from   G10_convertor_format import UTimeToDTime
 
 
-def AmountToString(amount: float | int, flag_point: bool = False, flag_sign: bool = False) -> str:
+def AmountToString(amount: float | int | None, flag_point: bool = False, flag_sign: bool = False) -> str:
 	""" Конвертация суммы в строку с разделением триад """
-	if flag_point: return f"{'+' if (flag_sign and amount > 0) else ''}{amount:,.2f}".replace(',', ' ')
-	else:          return f"{'+' if (flag_sign and amount > 0) else ''}{amount:,.0f}".replace(',', ' ')
+	if amount is None: return ""
+
+	if flag_point    : return f"{'+' if (flag_sign and amount > 0) else ''}{amount:,.2f}".replace(',', ' ')
+	else             : return f"{'+' if (flag_sign and amount > 0) else ''}{amount:,.0f}".replace(',', ' ')
 
 
 # Время

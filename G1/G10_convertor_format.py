@@ -1,5 +1,5 @@
 # КОНВЕРТОР: ФОРМАТЫ
-# 08 дек 2024
+# 02 янв 2025
 
 import datetime
 import pytz
@@ -47,7 +47,13 @@ def StringToDateTime(text: str) -> datetime.datetime | None:
 	try   : return datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M:%S")
 	except: pass
 
+	try   : return datetime.datetime.strptime(raw, "%Y-%m-%d %H:%M")
+	except: pass
+
 	try   : return datetime.datetime.strptime(raw, "%d-%m-%Y %H:%M:%S")
+	except: pass
+
+	try   : return datetime.datetime.strptime(raw, "%d-%m-%Y %H:%M")
 	except: pass
 
 	# Подбор преобразования из формата дата
