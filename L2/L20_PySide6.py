@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 12 ноя 2024
+# 05 фев 2025
 
 import enum
 
@@ -68,7 +68,7 @@ class C20_PySideApplication(QApplication):
 
 		self.Init_20()
 
-		self.on_Init()
+		self.on_Inited()
 
 	def Init_00(self):
 		""" Инициализация параметров """
@@ -86,7 +86,7 @@ class C20_PySideApplication(QApplication):
 	def Init_20(self)   : pass
 
 	# СИСТЕМНЫЕ СОБЫТИЯ
-	def on_Init(self):
+	def on_Inited(self):
 		""" Событие: При инициализации """
 
 	def on_Start(self):
@@ -125,7 +125,7 @@ class C20_PySideForm(QMainWindow):
 		self.InitMenus()
 		self.InitEvents()
 
-		self.on_Init()
+		self.on_Inited()
 
 	def Init_00(self)    : pass
 	def Init_01(self)    : pass
@@ -190,7 +190,7 @@ class C20_PySideForm(QMainWindow):
 
 	# СЛУЖЕБНЫЕ СОБЫТИЯ
 	def on_Close(self)            : pass
-	def on_Init(self)             : pass
+	def on_Inited(self)             : pass
 	def on_Open(self)             : pass
 	def on_Show(self)             : pass
 	def on_UpdateData(self)       : pass
@@ -201,6 +201,22 @@ class C20_PySideForm(QMainWindow):
 # UI-Компоненты
 class C20_DiaFrame(QWidget):
 	""" UI-компонент область отрисовки """
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self.Init_00()
+		self.Init_01()
+		self.Init_10()
+		self.Init_11()
+		self.Init_20()
+
+	def Init_00(self): pass
+	def Init_01(self): pass
+	def Init_10(self): pass
+	def Init_11(self): pass
+	def Init_20(self): pass
+
 	def DrawBackground(self, painter: QPainter):
 		pass
 
@@ -520,6 +536,8 @@ class C20_StandardItemModel(QStandardItemModel):
 		""" Перезапись служебного метода """
 		self.index_processing = index
 
+		result = super().setData(index, value, role)
+
 		if   role == Qt.ItemDataRole.DisplayRole:
 			self.dataChanged.emit()
 
@@ -530,7 +548,7 @@ class C20_StandardItemModel(QStandardItemModel):
 			if value == Qt.CheckState.Checked.value : self.itemChecked.emit()
 			else                                    : self.itemUnchecked.emit()
 
-		return super().setData(index, value, role)
+		return result
 
 	# Инструментарий
 	def removeAll(self):
@@ -542,7 +560,7 @@ class C20_StandardItemModel(QStandardItemModel):
 		return self.indexByData(ido, ROLES.IDO) is not None
 
 	# Инструментарий отображения
-	def setRowColor(self, parent: QStandardItem, row: int, color_bg: QColor = Qt.GlobalColor.white, color_fg: QColor = Qt.GlobalColor.black):
+	def setRowColor(self, parent: QStandardItem, row: int, color_bg: QColor = Qt.GlobalColor.transparent, color_fg: QColor = Qt.GlobalColor.black):
 		""" Установка цвета строки """
 		for index_col in range(self.columnCount()):
 			item_child : QStandardItem | None = parent.child(row, index_col)

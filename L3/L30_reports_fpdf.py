@@ -6,8 +6,8 @@ import enum
 from   dataclasses import dataclass
 from   datetime    import datetime
 from   pathlib     import Path
-from fpdf import Align, FPDF, FontFace, XPos, YPos
-from   fpdf.enums  import CellBordersLayout, TableBordersLayout, VAlign
+from   fpdf        import Align, FPDF, FontFace, XPos, YPos
+from   fpdf.enums  import TableBordersLayout, VAlign
 from   fpdf.table  import Row
 
 

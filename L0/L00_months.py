@@ -3,7 +3,7 @@
 import enum
 
 
-MONTHS_S = ["", "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
+MONTHS_SHORT = ["", "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
 
 
 class MONTHS(enum.Enum):
@@ -23,14 +23,14 @@ class MONTHS(enum.Enum):
 	DEC = 12
 
 	def __init__(self, code: int):
-		self.code   = code
-		self.name_s = MONTHS_S[code]
+		self.code       = code
+		self.name_short = MONTHS_SHORT[code]
 
 	def __str__(self) -> str:
-		return self.name_s
+		return self.name_short
 
 	@classmethod
 	def FindByNameS(cls, text: str) -> 'MONTHS':
 		""" Поиск по имени """
-		try   : return MONTHS(MONTHS_S.index(text))
+		try   : return MONTHS(MONTHS_SHORT.index(text))
 		except: raise
