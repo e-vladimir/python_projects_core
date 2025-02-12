@@ -152,34 +152,37 @@ class C20_PySideForm(QMainWindow):
 
 	def Close(self):
 		""" Закрытие формы """
-		self.on_Close()
+		self.on_RequestClose()
 		self.close()
+		self.on_Closed()
 
 	def Open(self):
 		""" Открытие формы """
-		self.on_Open()
+		self.on_RequestOpen()
 
 		if not self.isMaximized(): self.MoveToCenter()
 
 		self.show()
 
+		self.on_Opened()
+
 	def show(self):
 		super().show()
 
-		self.on_Show()
+		self.on_Showed()
 
 	def UpdateData(self):
 		""" Обновление данных """
-		self.on_UpdateData()
+		self.on_RequestUpdateData()
 
-	def UpdateDataPartial(self):
+	def PartialUpdateData(self):
 		""" Обновление данных (частичное) """
-		self.on_UpdateDataPartial()
+		self.on_RequestPartialUpdateData()
 
 	# СИСТЕМНЫЕ СОБЫТИЯ
 	def closeEvent(self, event: QtGui.QCloseEvent) -> None:
 		""" Системное событие закрытия формы """
-		self.on_Close()
+		self.on_RequestClose()
 
 		super().closeEvent(event)
 
@@ -190,13 +193,15 @@ class C20_PySideForm(QMainWindow):
 		self.on_Resize()
 
 	# СЛУЖЕБНЫЕ СОБЫТИЯ
-	def on_Close(self)            : pass
-	def on_Inited(self)             : pass
-	def on_Open(self)             : pass
-	def on_Show(self)             : pass
-	def on_UpdateData(self)       : pass
-	def on_UpdateDataPartial(self): pass
-	def on_Resize(self): pass
+	def on_Inited(self)                  : pass
+	def on_RequestOpen(self)             : pass
+	def on_Opened(self)                  : pass
+	def on_Showed(self)                  : pass
+	def on_RequestClose(self)            : pass
+	def on_Closed(self)                  : pass
+	def on_RequestUpdateData(self)       : pass
+	def on_RequestPartialUpdateData(self): pass
+	def on_Resize(self)                  : pass
 
 
 # UI-Компоненты
