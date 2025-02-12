@@ -1,5 +1,5 @@
 # УТИЛИТЫ: ГЕНЕРАТОР GL-ФАЙЛОВ И КЛАССОВ
-# 11 фев 2025
+# 12 фев 2025
 
 import datetime
 import enum
@@ -44,6 +44,9 @@ DIR_ROOT          = "./"
 
 # Генерация UI-Класса
 TARGET_IS_UI      = True
+
+# Генерация файлов без деления по папкам
+TARGET_IS_FLAT    = False
 
 # Генерация единого файла, без разделения на L4-9
 TARGET_IS_SINGLE  = False
@@ -110,7 +113,7 @@ def GenerateFile():
 	""" Генерация файла """
 	global LEVEL
 
-	LEVEL_PATH    : Path      = Path(DIR_ROOT).joinpath(f"L{LEVEL//10}")
+	LEVEL_PATH    : Path      = Path(DIR_ROOT) if TARGET_IS_FLAT else Path(DIR_ROOT).joinpath(f"L{LEVEL//10}")
 	FILE_PATH     : Path      = LEVEL_PATH.joinpath(f"L{LEVEL:02d}_{FILE_NAME}.py")
 
 	idx_level     : int       = LEVELS.index(LEVEL)
