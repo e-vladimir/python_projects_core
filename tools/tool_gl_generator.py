@@ -5,7 +5,7 @@ import datetime
 import enum
 
 from   dataclasses import dataclass
-from os import mkdir
+from   os          import mkdir
 from   pathlib     import Path
 
 
