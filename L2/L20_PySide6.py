@@ -1,10 +1,10 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 05 фев 2025
+# 12 фев 2025
 
 import enum
 
-from   pathlib           import Path
-from   PySide6           import QtGui
+from   pathlib           import  Path
+from   PySide6           import  QtGui
 from   PySide6.QtCore    import (Qt,
                                  QModelIndex,
                                  Signal)
@@ -14,18 +14,19 @@ from   PySide6.QtGui     import (QStandardItemModel,
                                  QColor,
                                  QFont)
 from   PySide6.QtWidgets import (QApplication,
-	                             QFileDialog,
-	                             QInputDialog,
-	                             QMainWindow,
-	                             QMessageBox,
-	                             QWidget,
-	                             QDialog,
-	                             QFormLayout,
-	                             QLabel,
-	                             QDialogButtonBox,
-	                             QListWidget,
-	                             QListWidgetItem,
-	                             QPlainTextEdit, QLineEdit)
+                                 QFileDialog,
+                                 QGroupBox, QInputDialog,
+                                 QMainWindow,
+                                 QMessageBox,
+                                 QWidget,
+                                 QDialog,
+                                 QFormLayout,
+                                 QLabel,
+                                 QDialogButtonBox,
+                                 QListWidget,
+                                 QListWidgetItem,
+                                 QPlainTextEdit,
+                                 QLineEdit)
 
 
 class ROLES(enum.IntEnum):
@@ -229,6 +230,28 @@ class C20_DiaFrame(QWidget):
 		self.DrawBackground(painter)
 
 		self.DrawBorder(painter)
+
+
+class C20_ActiveLabel(QLabel):
+	""" Label с реакцией на клик """
+
+	clicked = Signal()
+
+	def mouseReleaseEvent(self, ev):
+		super().mouseReleaseEvent(ev)
+
+		self.clicked.emit()
+
+
+class C20_ActiveGroupBox(QGroupBox):
+	""" GroupBox с реакцией на клик """
+
+	clicked = Signal()
+
+	def mouseReleaseEvent(self, ev):
+		super().mouseReleaseEvent(ev)
+
+		self.clicked.emit()
 
 
 # ИНСТРУМЕНТАРИЙ СООБЩЕНИЙ
