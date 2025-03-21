@@ -80,7 +80,7 @@ def CountDdInDyDm(dy: int, dm: int) -> int:
 	""" Количество дней в месяце """
 	match dm:
 		case  1: return 31
-		case  2: return 28 + dy % 4
+		case  2: return 28 + int(dy % 4 == 0)
 		case  3: return 31
 		case  4: return 30
 		case  5: return 31
