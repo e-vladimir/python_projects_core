@@ -1,5 +1,5 @@
 # УТИЛИТЫ: ГЕНЕРАТОР GL-ФАЙЛОВ И КЛАССОВ
-# 12 фев 2025
+# 20 мар 2025
 
 import datetime
 import enum
@@ -27,29 +27,32 @@ class META_CLASSES(ClassInfo, enum.Enum):
 
 # ПАРАМЕТРЫ ГЕНЕРАЦИИ
 # Мета-класс
-META_CLASS       = META_CLASSES.C20_META_FRAME
+META_CLASS       = META_CLASSES.C20_PYSIDE_FORM
 
 # Имя класса
-CLASS_NAME        = "SomethingCalculator"
+CLASS_NAME        = "FormBackups"
 
 # Описание класса
-CLASS_DESCRIPTION = "Калькулятор чего-то там"
+CLASS_DESCRIPTION = "Форма Копии архива данных"
 
 # Имя файла
 # Если оставить пустым, сгенерируется автоматически из имени класса
 FILE_NAME         = ""
 
 # Корневая папка генерации файлов/директорий L
-DIR_ROOT          = "./"
+DIR_ROOT          = "./ui/form_backups"
 
 # Генерация UI-Класса
 TARGET_IS_UI      = True
 
 # Генерация файлов без деления по папкам
-TARGET_IS_FLAT    = False
+TARGET_IS_FLAT    = True
 
 # Генерация единого файла, без разделения на L4-9
 TARGET_IS_SINGLE  = False
+
+# Генерация с перезаписью файла
+TARGET_REWRITE    = False
 
 
 # СЛУЖЕБНЫЕ ПАРАМЕТРЫ
@@ -106,6 +109,8 @@ def GenerateSingleFile():
 		data.append(f'\tpass')
 		data.append(f'')
 
+	if FILE_PATH.exists() and not TARGET_REWRITE: return
+
 	with open(FILE_PATH.absolute(), "w") as file: file.write('\n'.join(data))
 
 
@@ -132,6 +137,8 @@ def GenerateFile():
 	data.append(f'\t""" {CLASS_DESCRIPTION}: {LevelToString()} """')
 	data.append(f'\tpass')
 	data.append(f'')
+
+	if FILE_PATH.exists() and not TARGET_REWRITE: return
 
 	if not LEVEL_PATH.exists(): mkdir(LEVEL_PATH)
 	with open(FILE_PATH, "w") as file: file.write('\n'.join(data))

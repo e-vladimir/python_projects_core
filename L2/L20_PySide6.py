@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 12 фев 2025
+# 20 мар 2025
 
 import enum
 
@@ -8,11 +8,11 @@ from   PySide6           import  QtGui
 from   PySide6.QtCore    import (Qt,
                                  QModelIndex,
                                  Signal)
-from   PySide6.QtGui     import (QStandardItemModel,
-                                 QStandardItem,
-                                 QPainter,
-                                 QColor,
-                                 QFont)
+from   PySide6.QtGui     import (QMouseEvent, QStandardItemModel,
+	                             QStandardItem,
+	                             QPainter,
+	                             QColor,
+	                             QFont)
 from   PySide6.QtWidgets import (QApplication,
                                  QFileDialog,
                                  QGroupBox, QInputDialog,
@@ -32,8 +32,9 @@ from   PySide6.QtWidgets import (QApplication,
 class ROLES(enum.IntEnum):
 	TEXT              = Qt.ItemDataRole.DisplayRole
 	IDO               = 100
-	FILENAME          = 101
-	GROUP             = 102
+	IDP               = 101
+	FILENAME          = 102
+	GROUP             = 103
 	VISUAL_STYLE_CELL = 200
 	VISUAL_STYLE_ROW  = 201
 	SORT_INDEX        = 300
@@ -79,7 +80,7 @@ class C20_PySideApplication(QApplication):
 	def Init_01(self):
 		""" Инициализация директорий """
 		self._path_common : Path = Path.cwd()
-		self._path_ui     : Path = Path.joinpath(self._path_common, "ui")
+		self._path_ui     : Path = self._path_common / "ui"
 
 	def Init_10(self)   : pass
 	def Init_11(self)   : pass
@@ -110,7 +111,7 @@ class C20_PySideForm(QMainWindow):
 	def __init__(self, application: C20_PySideApplication, *args, **kwargs):
 		super().__init__(None)
 
-		self.application = application
+		self.Application = application
 
 		self.InitUi()
 
@@ -233,30 +234,39 @@ class C20_DiaFrame(QWidget):
 		painter = QPainter(self)
 
 		self.DrawBackground(painter)
-
 		self.DrawBorder(painter)
 
 
 class C20_ActiveLabel(QLabel):
 	""" Label с реакцией на клик """
 
-	clicked = Signal()
+	clicked        = Signal()
+	wheelMovedUp   = Signal()
+	wheelMovedDown = Signal()
 
-	def mouseReleaseEvent(self, ev):
+	def mouseReleaseEvent(self, ev: QMouseEvent):
 		super().mouseReleaseEvent(ev)
 
-		self.clicked.emit()
+		match ev.button():
+			case Qt.MouseButton.LeftButton: self.clicked.emit()
 
+	def wheelEvent(self, event):
+		try   :
+			if   event.angleDelta().y() < 0: self.wheelMovedDown.emit()
+			elif event.angleDelta().y() > 0: self.wheelMovedUp.emit()
+		except: pass
+		super().wheelEvent(event)
 
 class C20_ActiveGroupBox(QGroupBox):
 	""" GroupBox с реакцией на клик """
 
 	clicked = Signal()
 
-	def mouseReleaseEvent(self, ev):
+	def mouseReleaseEvent(self, ev: QMouseEvent):
 		super().mouseReleaseEvent(ev)
 
-		self.clicked.emit()
+		match ev.button():
+			case Qt.MouseButton.LeftButton: self.clicked.emit()
 
 
 # ИНСТРУМЕНТАРИЙ СООБЩЕНИЙ
@@ -614,14 +624,14 @@ class C20_StandardItemModel(QStandardItemModel):
 		item_child.setBackground(color_bg)
 		item_child.setForeground(color_fg)
 
-	def setRowBold(self, parent: QStandardItem, row: int):
+	def setRowBold(self, parent: QStandardItem, row: int, flag: bool = True):
 		""" Установка шрифта строки Жирный """
 		for index_col in range(self.columnCount()):
 			item_child : QStandardItem | None = parent.child(row, index_col)
 			if item_child is None: continue
 
 			font_item  : QFont                = item_child.font()
-			font_item.setBold(True)
+			font_item.setBold(flag)
 
 			item_child.setFont(font_item)
 
@@ -667,9 +677,10 @@ class C20_StandardItemModel(QStandardItemModel):
 					item_model.setForeground(color_fg)
 
 	# Выборки данных
-	def indexes(self) -> list[QModelIndex]:
+	def indexes(self, parent: QModelIndex = None) -> list[QModelIndex]:
 		""" Список всех индексов в колонке 0 """
-		return IndexesFromStandardModel(self)
+		if parent is None: return IndexesFromStandardModel(self)
+		else             : return [self.index(idx_row, 0, parent) for idx_row in range(self.rowCount(parent))]
 
 	def indexByData(self, text: str, role : Qt.ItemDataRole | ROLES = Qt.ItemDataRole.DisplayRole) -> QModelIndex | None:
 		""" Поиск индекса по данным """
