@@ -1,5 +1,6 @@
 # ОБРАБОТЧИКИ СПИСКОВ
 # 29 мар 2025
+import re
 
 
 def DistinctAndSortList1D(values: list, flag_distinct: bool = False, flag_sort: bool = False) -> list:
@@ -49,6 +50,14 @@ def DifferenceLists(list_1: list, list_2: list, flag_cmp_1_to_2: bool = False) -
 	return result
 
 
-def CLeanList(items: list[str]) -> list[str]:
-	""" Чистый список от пустых строк и пробелов """
-	return sorted(filter(lambda item: len(item) > 0, [item.strip() for item in items]))
+def ClearList(items: list[str], clear_short: bool = True, clear_empty: bool = True, clear_spaces: bool = True, clear_numbers: bool = True, clear_simbols: bool = True, flag_sort: bool = True) -> list[str]:
+	""" Очистка списка от пустых строк, пробелов, чисел, спецсимволов """
+	result = items[:]
+
+	if clear_numbers: result = [re.sub(r'[0-9]',                 '', item) for item in result]
+	if clear_simbols: result = [re.sub(r'[^a-zA-Zа-яА-Я0-9\s.]', '', item) for item in result]
+	if clear_spaces : result = [item.strip().replace('  ', ' ')            for item in result]
+	if clear_empty  : result = filter(lambda item: len(item) > 0, result)
+	if clear_short  : result = filter(lambda item: len(item) > 3, result)
+
+	return sorted(result) if flag_sort else result
