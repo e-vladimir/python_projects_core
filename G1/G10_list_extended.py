@@ -31,8 +31,3 @@ def DistinctAndNatSortList2D(values: list, index_processing_item: int, flag_dist
 
 		return result
 	except: return []
-
-
-def FilteringList(items: list[str]) -> list[str]:
-	""" Фильтрация списка от пустых строк и сокращение пробелов """
-	return sorted(filter(lambda item: len(item) > 0, [item.strip() for item in items]))
