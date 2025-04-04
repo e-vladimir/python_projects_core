@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 20 мар 2025
+# 04 апр 2025
 
 import enum
 
@@ -8,25 +8,30 @@ from   PySide6           import  QtGui
 from   PySide6.QtCore    import (Qt,
                                  QModelIndex,
                                  Signal)
-from   PySide6.QtGui     import (QMouseEvent, QStandardItemModel,
-	                             QStandardItem,
+from   PySide6.QtGui     import (QColor,
+	                             QFont,
+	                             QIcon,
+	                             QKeyEvent,
+	                             QMouseEvent,
 	                             QPainter,
-	                             QColor,
-	                             QFont)
+	                             QStandardItem,
+	                             QStandardItemModel,
+	                             QTextCursor)
 from   PySide6.QtWidgets import (QApplication,
-                                 QFileDialog,
-                                 QGroupBox, QInputDialog,
-                                 QMainWindow,
-                                 QMessageBox,
-                                 QWidget,
-                                 QDialog,
-                                 QFormLayout,
-                                 QLabel,
-                                 QDialogButtonBox,
-                                 QListWidget,
-                                 QListWidgetItem,
-                                 QPlainTextEdit,
-                                 QLineEdit)
+	                             QDialog,
+	                             QDialogButtonBox,
+	                             QFileDialog,
+	                             QFormLayout,
+	                             QGroupBox,
+	                             QInputDialog,
+	                             QLabel,
+	                             QLineEdit,
+	                             QListWidget,
+	                             QListWidgetItem,
+	                             QMainWindow,
+	                             QMessageBox,
+	                             QPlainTextEdit,
+	                             QWidget)
 
 
 class ROLES(enum.IntEnum):
@@ -257,6 +262,7 @@ class C20_ActiveLabel(QLabel):
 		except: pass
 		super().wheelEvent(event)
 
+
 class C20_ActiveGroupBox(QGroupBox):
 	""" GroupBox с реакцией на клик """
 
@@ -267,6 +273,88 @@ class C20_ActiveGroupBox(QGroupBox):
 
 		match ev.button():
 			case Qt.MouseButton.LeftButton: self.clicked.emit()
+
+
+class C20_PlainTextEditWithCompleter(QPlainTextEdit):
+	""" Текстовое поле ввода с поддержкой автодополнения """
+	
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+
+		self._raw_dictionary : list[str] = []
+		self._dictionary     : list[str] = []
+
+		self._text_cursor   = self.textCursor()
+
+	@property
+	def dictionary(self) -> list[str]:
+		return sorted(self._raw_dictionary)
+
+	@dictionary.setter
+	def dictionary(self, words: list[str]):
+		self._raw_dictionary = ' '.join(filter(lambda word: len(word) > 3, words)).replace(' ', ' ').split(' ')
+		self._dictionary     = sorted([word.lower() for word in self._raw_dictionary])
+
+	def _requestComplete(self):
+		self._text_cursor.select(QTextCursor.SelectionType.WordUnderCursor)
+		selected_text = self._text_cursor.selectedText().lower()
+
+		if len(selected_text) >= 3:
+			for item in self._dictionary:
+				if selected_text not in item: continue
+
+				pos = self._text_cursor.position()
+
+				self._text_cursor.setPosition(pos)
+				self._text_cursor.insertText(item[len(selected_text):])
+				self._text_cursor.setPosition(pos)
+				self._text_cursor.setPosition(pos + len(item) - len(selected_text), QTextCursor.MoveMode.KeepAnchor)
+
+				self.setTextCursor(self._text_cursor)
+
+				break
+
+	def _requestApplyComplete(self) -> bool:
+		if not self.textCursor().selection().toPlainText().strip(): return False
+
+		self._text_cursor.setPosition(self._text_cursor.selectionEnd())
+		self._text_cursor.insertText(' ')
+		self.setTextCursor(self._text_cursor)
+
+		return True
+
+	def keyPressEvent(self, event: QKeyEvent) -> None:
+		if event.key() == Qt.Key.Key_Return:
+			if self._requestApplyComplete(): return
+
+		super().keyPressEvent(event)
+
+		match event.key():
+			case Qt.Key.Key_Backspace: return
+			case Qt.Key.Key_Control  : return
+			case Qt.Key.Key_Copy     : return
+			case Qt.Key.Key_Down     : return
+			case Qt.Key.Key_F1       : return
+			case Qt.Key.Key_F10      : return
+			case Qt.Key.Key_F11      : return
+			case Qt.Key.Key_F12      : return
+			case Qt.Key.Key_F2       : return
+			case Qt.Key.Key_F3       : return
+			case Qt.Key.Key_F4       : return
+			case Qt.Key.Key_F5       : return
+			case Qt.Key.Key_F6       : return
+			case Qt.Key.Key_F7       : return
+			case Qt.Key.Key_F8       : return
+			case Qt.Key.Key_F9       : return
+			case Qt.Key.Key_Left     : return
+			case Qt.Key.Key_Paste    : return
+			case Qt.Key.Key_Return   : return
+			case Qt.Key.Key_Right    : return
+			case Qt.Key.Key_Shift    : return
+			case Qt.Key.Key_Space    : return
+			case Qt.Key.Key_Up       : return
+
+			case _                   : self._requestComplete()
 
 
 # ИНСТРУМЕНТАРИЙ СООБЩЕНИЙ
@@ -282,7 +370,7 @@ def ShowMessage(title: str, message: str, description: str = ""):
 
 # ИНСТРУМЕНТАРИЙ ЗАПРОСОВ
 class QMultipleItemsInputDialog(QDialog):
-	def __init__(self,  title, message, items: list[str], parent=None, items_checked: list[str] = []):
+	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None, items_checked: list[str] = []):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -292,12 +380,24 @@ class QMultipleItemsInputDialog(QDialog):
 
 		self.list_items   = QListWidget()
 
-		for item in items:
-			item_text = QListWidgetItem()
-			item_text.setText(item)
-			item_text.setCheckState(Qt.CheckState.Unchecked if item not in items_checked else Qt.CheckState.Checked)
+		match items:
+			case list():
+				for item in items:
+					item_text = QListWidgetItem()
+					item_text.setText(item)
+					item_text.setCheckState(Qt.CheckState.Unchecked if item not in items_checked else Qt.CheckState.Checked)
 
-			self.list_items.addItem(item_text)
+					self.list_items.addItem(item_text)
+
+			case dict():
+				for text, icon in items.items():
+					item_text = QListWidgetItem()
+					item_text.setIcon(icon)
+					item_text.setText(text)
+					item_text.setCheckState(Qt.CheckState.Unchecked if text not in items_checked else Qt.CheckState.Checked)
+
+					self.list_items.addItem(item_text)
+
 
 		layout_form.addRow(self.list_items)
 
@@ -317,6 +417,45 @@ class QMultipleItemsInputDialog(QDialog):
 			result.append(item_text.data(Qt.ItemDataRole.DisplayRole))
 
 		return result
+
+
+class QItemsInputDialog(QDialog):
+	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None):
+		super().__init__(parent)
+
+		self.setWindowTitle(title)
+
+		layout_form     = QFormLayout(self)
+		layout_form.addRow(QLabel(message))
+
+		self.list_items = QListWidget()
+
+		match items:
+			case list():
+				for text in items:
+					item_text = QListWidgetItem()
+					item_text.setText(text)
+
+					self.list_items.addItem(item_text)
+
+			case dict():
+				for text, icon in items.items():
+					item_text = QListWidgetItem()
+					item_text.setIcon(icon)
+					item_text.setText(text)
+
+					self.list_items.addItem(item_text)
+
+		layout_form.addRow(self.list_items)
+
+		btn_box         = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
+		layout_form.addRow(btn_box)
+
+		btn_box.accepted.connect(self.accept)
+		btn_box.rejected.connect(self.reject)
+
+	def selectedItem(self) -> str | None:
+		return self.list_items.currentItem().data(Qt.ItemDataRole.DisplayRole)
 
 
 class QFindReplaceTextDialog(QDialog):
@@ -358,7 +497,7 @@ class QFindReplaceTextDialog(QDialog):
 
 
 class QMultipleTextInputDialog(QDialog):
-	def __init__(self,  title, message, items: list[any], parent=None):
+	def __init__(self, title, message, items: list[any], parent=None, dictionary : list[str] = []):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -368,8 +507,10 @@ class QMultipleTextInputDialog(QDialog):
 		layout_form    = QFormLayout(self)
 		layout_form.addRow(QLabel(message))
 
-		self.edit_text   = QPlainTextEdit()
+		self.edit_text   = C20_PlainTextEditWithCompleter()
+		self.edit_text.dictionary = dictionary
 		self.edit_text.setPlainText('\n'.join(items))
+
 		layout_form.addRow(self.edit_text)
 
 		btn_box     = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
@@ -389,19 +530,20 @@ def RequestText(title: str, message: str, old_text: str = "", items: list[str] |
 	dialog.setWindowTitle(title)
 	dialog.setLabelText(message)
 	dialog.resize(480, 150)
-	dialog.setTextValue(old_text)
 
 	if items is not None:
 		dialog.setComboBoxItems(items)
 		dialog.setComboBoxEditable(True)
 
+	dialog.setTextValue(old_text)
+
 	if not dialog.exec_(): return None
 	return dialog.textValue()
 
 
-def RequestMultipleText(title: str, message: str, old_text: list[str] = []) -> None | list[str]:
+def RequestMultipleText(title: str, message: str, old_text: list[str] = [], dictionary: list[str] = []) -> None | list[str]:
 	""" Запрос многострочного текста """
-	dialog = QMultipleTextInputDialog(title, message, old_text)
+	dialog = QMultipleTextInputDialog(title, message, old_text, None, dictionary)
 
 	if not dialog.exec_(): return None
 	return dialog.textValues()
@@ -440,17 +582,16 @@ def RequestConfirm(title: str, message: str, flag_btn_cancel: bool = False) -> b
 	return result == QMessageBox.StandardButton.Yes
 
 
-def RequestItem(title: str, message: str, items: list[str]) -> str | None:
+def RequestItem(title: str, message: str, items: list[str] | dict[str, QIcon]) -> str | None:
 	""" Запрос значения из списка """
 	if not items               : return None
 
-	dialog_items     = QInputDialog(None)
-	dialog_items.setWindowTitle(title)
-	dialog_items.setLabelText(message)
-	dialog_items.setComboBoxItems(items)
-	dialog_items.setOption(dialog_items.InputDialogOption.UseListViewForComboBoxItems, True)
+	dialog_items     = QItemsInputDialog(title, message, items)
 
-	max_length : int = max(list(map(len, items)))
+	match items:
+		case list(): max_length : int = max(list(map(len, items)))
+		case dict(): max_length : int = max(list(map(len, items.keys())))
+		case _     : max_length : int = 480
 
 	size_w     : int = min(480, max_length * 15)
 	size_w           = max(360, size_w)
@@ -461,10 +602,10 @@ def RequestItem(title: str, message: str, items: list[str]) -> str | None:
 
 	if not dialog_items.exec_(): return None
 
-	return dialog_items.textValue()
+	return dialog_items.selectedItem()
 
 
-def RequestItems(title: str, message: str, items: list[str], items_checked: list[str] = []) -> list[str] | None:
+def RequestItems(title: str, message: str, items: list[str], items_checked: list[str] | dict[str, QIcon] = []) -> list[str] | None:
 	""" Запрос значений из списка """
 	if not items               : return None
 	
