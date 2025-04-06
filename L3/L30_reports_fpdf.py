@@ -1,5 +1,5 @@
 # ГЕНЕРАТОР ОТЧЁТОВ НА БАЗЕ FPDF
-# 10 мар 2025
+# 01 янв 2025
 
 import enum
 
@@ -9,9 +9,6 @@ from   pathlib     import Path
 from   fpdf        import Align, FPDF, FontFace, XPos, YPos
 from   fpdf.enums  import TableBordersLayout, VAlign
 from   fpdf.table  import Row
-
-
-MONTHS_SHORT = ["", "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
 
 
 class BLOCKS(enum.Enum):
@@ -347,7 +344,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.set_xy(self.w - self.margins_page.r - shift_w, shift_y)
 		self.cell(w     = shift_w,
-		          text  = f"ред. {self.info_document.edition} от {self.info_document.date.day:02d} {MONTHS_SHORT[self.info_document.date.month]} {self.info_document.date.year:04d}",
+		          text  = f"ред. {self.info_document.edition} от {self.info_document.date:%d/%m/%Y}",
 		          align = Align.R,
 		          new_x = XPos.START,
 		          new_y = YPos.TOP)

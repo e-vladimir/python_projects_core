@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 04 апр 2025
+# 06 апр 2025
 
 import enum
 
@@ -32,6 +32,15 @@ from   PySide6.QtWidgets import (QApplication,
 	                             QMessageBox,
 	                             QPlainTextEdit,
 	                             QWidget)
+
+
+CHARS_RU_L = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я']
+CHARS_RU_U = [item.upper() for item in CHARS_RU_L]
+CHARS_RU   = [ord(item) for item in CHARS_RU_L + CHARS_RU_U]
+
+CHARS_EN_L = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+CHARS_EN_U = [item.upper() for item in CHARS_RU_L]
+CHARS_EN   = [ord(item) for item in CHARS_EN_L + CHARS_EN_U]
 
 
 class ROLES(enum.IntEnum):
@@ -329,32 +338,8 @@ class C20_PlainTextEditWithCompleter(QPlainTextEdit):
 
 		super().keyPressEvent(event)
 
-		match event.key():
-			case Qt.Key.Key_Backspace: return
-			case Qt.Key.Key_Control  : return
-			case Qt.Key.Key_Copy     : return
-			case Qt.Key.Key_Down     : return
-			case Qt.Key.Key_F1       : return
-			case Qt.Key.Key_F10      : return
-			case Qt.Key.Key_F11      : return
-			case Qt.Key.Key_F12      : return
-			case Qt.Key.Key_F2       : return
-			case Qt.Key.Key_F3       : return
-			case Qt.Key.Key_F4       : return
-			case Qt.Key.Key_F5       : return
-			case Qt.Key.Key_F6       : return
-			case Qt.Key.Key_F7       : return
-			case Qt.Key.Key_F8       : return
-			case Qt.Key.Key_F9       : return
-			case Qt.Key.Key_Left     : return
-			case Qt.Key.Key_Paste    : return
-			case Qt.Key.Key_Return   : return
-			case Qt.Key.Key_Right    : return
-			case Qt.Key.Key_Shift    : return
-			case Qt.Key.Key_Space    : return
-			case Qt.Key.Key_Up       : return
-
-			case _                   : self._requestComplete()
+		if   event.key() in CHARS_RU: self._requestComplete()
+		elif event.key() in CHARS_EN: self._requestComplete()
 
 
 # ИНСТРУМЕНТАРИЙ СООБЩЕНИЙ
