@@ -20,7 +20,7 @@ report = C30_ProcessorReportsFpdf2()
 report.info_document.title = "Тестовый документ"
 report.info_document.subtitle = "Испытания генерации"
 report.info_document.edition = random.randint(100, 10000)
-report.LoadFonts(Path("./L0/fonts"))
+report.LoadFonts(Path("../L0/fonts"))
 report.NewPage()
 report.AppendText(h1   = "Logback",
                   text = "As you already know, developers have a lot of logging tools at their disposal. In this topic, we are going to learn more about a popular logging library named Logback. It is a successor to the Log4j logging library and is based on similar concepts. Logback is fast in both synchronous and asynchronous logging and offers many useful features, which makes it a good choice for a project of any scale.")

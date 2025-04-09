@@ -1,14 +1,19 @@
 # ГЕНЕРАТОР ОТЧЁТОВ НА БАЗЕ FPDF
-# 01 янв 2025
+# 09 апр 2025
 
 import enum
 
-from   dataclasses import dataclass
-from   datetime    import datetime
-from   pathlib     import Path
-from   fpdf        import Align, FPDF, FontFace, XPos, YPos
-from   fpdf.enums  import TableBordersLayout, VAlign
-from   fpdf.table  import Row
+from   PIL           import Image
+from   PIL.ImageFile import ImageFile
+from   dataclasses   import dataclass
+from   datetime      import datetime
+from   fpdf          import Align, FPDF, FontFace, XPos, YPos
+from   fpdf.enums    import TableBordersLayout, VAlign
+from   fpdf.table    import Row
+from   pathlib       import Path
+
+
+MONTHS_SHORT = ["", "янв", "фев", "мар", "апр", "май", "июн", "июл", "авг", "сен", "окт", "ноя", "дек"]
 
 
 class BLOCKS(enum.Enum):
@@ -292,17 +297,19 @@ class C30_ProcessorReportsFpdf2(FPDF):
 		for idx, size  in enumerate(sizes) : column_sizes[idx]  = size
 		for idx, align in enumerate(aligns): column_aligns[idx] = align
 
-		self.SwitchFont(BLOCKS.DESCRIPTION)
-		self.SwitchColors(BLOCKS.DESCRIPTION)
+		if description:
+			self.SwitchFont(BLOCKS.DESCRIPTION)
+			self.SwitchColors(BLOCKS.DESCRIPTION)
 
-		self.multi_cell(w     = 0.00,
-		                text  = description,
-		                align = Align.R,)
+			self.multi_cell(w     = 0.00,
+			                text  = description,
+			                align = Align.R,)
 
 		self.SwitchFont(BLOCKS.TABLE)
 		self.SwitchColors(BLOCKS.TABLE)
 
-		self.ln(2)
+		if description:
+			self.ln(2)
 
 		style_header = FontFace(color      =   0,
 		                        fill_color = 230,
@@ -322,6 +329,36 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 				for data_cell in data_row:
 					row.cell(data_cell)
+
+	def AppendImage(self, img: str | Path | ImageFile, description: str = "", width: int = 0, height: int = 0):
+		""" Добавление изображения """
+		try:
+			match img:
+				case str()      : data = Image.open(img)
+				case Path()     : data = Image.open(img)
+				case ImageFile(): data = img
+				case _          : return
+		except: return
+
+		data_width = width or self.epw
+
+		self.ln(5)
+		self.image(name              = data,
+		           alt_text          = description,
+		           h                 = height,
+		           keep_aspect_ratio = True,
+		           w                 = data_width,
+		           x                 = self.margins_page.l + (self.epw - data_width) / 2)
+
+		if description:
+			self.SwitchFont(BLOCKS.DESCRIPTION)
+			self.SwitchColors(BLOCKS.DESCRIPTION)
+
+			self.ln(1)
+
+			self.multi_cell(w     = 0.00,
+			                text  = description,
+			                align = Align.C)
 
 	def AppendHeader(self):
 		""" Размещение колонтитула верхнего """
@@ -344,7 +381,7 @@ class C30_ProcessorReportsFpdf2(FPDF):
 
 		self.set_xy(self.w - self.margins_page.r - shift_w, shift_y)
 		self.cell(w     = shift_w,
-		          text  = f"ред. {self.info_document.edition} от {self.info_document.date:%d/%m/%Y}",
+		          text  = f"ред. {self.info_document.edition} от {self.info_document.date.day:02d} {MONTHS_SHORT[self.info_document.date.month]} {self.info_document.date.year:04d}",
 		          align = Align.R,
 		          new_x = XPos.START,
 		          new_y = YPos.TOP)
