@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 06 апр 2025
+# 20 апр 2025
 
 import enum
 
@@ -49,6 +49,7 @@ class ROLES(enum.IntEnum):
 	IDP               = 101
 	FILENAME          = 102
 	GROUP             = 103
+	PARENT            = 104
 	VISUAL_STYLE_CELL = 200
 	VISUAL_STYLE_ROW  = 201
 	SORT_INDEX        = 300
@@ -223,6 +224,8 @@ class C20_PySideForm(QMainWindow):
 class C20_DiaFrame(QWidget):
 	""" UI-компонент область отрисовки """
 
+	clicked        = Signal()
+
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
 
@@ -249,6 +252,12 @@ class C20_DiaFrame(QWidget):
 
 		self.DrawBackground(painter)
 		self.DrawBorder(painter)
+
+	def mouseReleaseEvent(self, ev: QMouseEvent):
+		super().mouseReleaseEvent(ev)
+
+		match ev.button():
+			case Qt.MouseButton.LeftButton: self.clicked.emit()
 
 
 class C20_ActiveLabel(QLabel):
@@ -305,6 +314,7 @@ class C20_PlainTextEditWithCompleter(QPlainTextEdit):
 		self._dictionary     = sorted([word.lower() for word in self._raw_dictionary])
 
 	def _requestComplete(self):
+		self._text_cursor = self.textCursor()
 		self._text_cursor.select(QTextCursor.SelectionType.WordUnderCursor)
 		selected_text = self._text_cursor.selectedText().lower()
 
