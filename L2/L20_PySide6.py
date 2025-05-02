@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 20 апр 2025
+# 02 мая 2025
 
 import enum
 
@@ -36,11 +36,11 @@ from   PySide6.QtWidgets import (QApplication,
 
 CHARS_RU_L = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю', 'я']
 CHARS_RU_U = [item.upper() for item in CHARS_RU_L]
-CHARS_RU   = [ord(item) for item in CHARS_RU_L + CHARS_RU_U]
+CHARS_RU   = [ord(item)    for item in CHARS_RU_L + CHARS_RU_U]
 
 CHARS_EN_L = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 CHARS_EN_U = [item.upper() for item in CHARS_RU_L]
-CHARS_EN   = [ord(item) for item in CHARS_EN_L + CHARS_EN_U]
+CHARS_EN   = [ord(item)    for item in CHARS_EN_L + CHARS_EN_U]
 
 
 class ROLES(enum.IntEnum):
@@ -531,16 +531,16 @@ def RequestText(title: str, message: str, old_text: str = "", items: list[str] |
 		dialog.setComboBoxEditable(True)
 
 	dialog.setTextValue(old_text)
-
 	if not dialog.exec_(): return None
+
 	return dialog.textValue()
 
 
 def RequestMultipleText(title: str, message: str, old_text: list[str] = [], dictionary: list[str] = []) -> None | list[str]:
 	""" Запрос многострочного текста """
 	dialog = QMultipleTextInputDialog(title, message, old_text, None, dictionary)
-
 	if not dialog.exec_(): return None
+
 	return dialog.textValues()
 
 
@@ -564,6 +564,7 @@ def RequestValue(title: str, message: str, value_old: int | float = None, value_
 
 	if   type(value_old) is int  : return dialog.intValue()
 	elif type(value_old) is float: return dialog.doubleValue()
+	else                         : return None
 
 
 def RequestConfirm(title: str, message: str, flag_btn_cancel: bool = False) -> bool | None:
@@ -572,8 +573,8 @@ def RequestConfirm(title: str, message: str, flag_btn_cancel: bool = False) -> b
 	else              : btns = QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
 
 	result = QMessageBox(QMessageBox.Icon.Question, title, message, btns).exec_()
-
 	if result  == QMessageBox.StandardButton.Cancel: return None
+
 	return result == QMessageBox.StandardButton.Yes
 
 
@@ -594,7 +595,6 @@ def RequestItem(title: str, message: str, items: list[str] | dict[str, QIcon]) -
 	size_h           = max(240, size_h)
 
 	dialog_items.resize(size_w, size_h)
-
 	if not dialog_items.exec_(): return None
 
 	return dialog_items.selectedItem()
@@ -616,7 +616,6 @@ def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], 
 
 	dialog_items     = QMultipleItemsInputDialog(title, message, items, items_checked=items_checked)
 	dialog_items.resize(size_w, size_h)
-
 	if not dialog_items.exec_(): return None
 
 	return dialog_items.selectedItems()
@@ -626,7 +625,6 @@ def RequestFilepath(title: str, filename: str = "", filters: str = "") -> Path |
 	""" Запрос файла """
 	dialog_filepath = QFileDialog()
 	filepath, filemask = dialog_filepath.getOpenFileName(None, title, filename, filters)
-
 	if not filepath: return None
 
 	return Path(filepath)
@@ -640,7 +638,6 @@ def RequestDirectory(title: str, current_dir: str = "") -> Path | None:
 	dialog.setDirectory(current_dir)
 
 	directory : str = dialog.getExistingDirectory(None, title)
-
 	if not directory: return None
 
 	return Path(directory)
@@ -676,8 +673,7 @@ def IndexesFromStandardModel(model: QStandardItemModel, parent_index: QModelInde
 	""" Список индексов из модели """
 	result : list[QModelIndex] = []
 
-	if parent_index is None: count_row = model.rowCount()
-	else                   : count_row = model.rowCount(parent_index)
+	count_row = model.rowCount() if parent_index is None else model.rowCount(parent_index)
 
 	for index_row in range(count_row):
 		if parent_index is None: index_item : QModelIndex = model.index(index_row, 0)
