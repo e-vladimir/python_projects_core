@@ -1,5 +1,5 @@
 # ПАКЕТ ДЛЯ РАБОТЫ С PYSIDE-6
-# 02 мая 2025
+# 03 мая 2025
 
 import enum
 
@@ -365,7 +365,7 @@ def ShowMessage(title: str, message: str, description: str = ""):
 
 # ИНСТРУМЕНТАРИЙ ЗАПРОСОВ
 class QMultipleItemsInputDialog(QDialog):
-	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None, items_checked: list[str] = []):
+	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None, items_checked: list[str] | None = None):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -380,7 +380,7 @@ class QMultipleItemsInputDialog(QDialog):
 				for item in items:
 					item_text = QListWidgetItem()
 					item_text.setText(item)
-					item_text.setCheckState(Qt.CheckState.Unchecked if item not in items_checked else Qt.CheckState.Checked)
+					item_text.setCheckState(Qt.CheckState.Unchecked if item not in (items_checked or []) else Qt.CheckState.Checked)
 
 					self.list_items.addItem(item_text)
 
@@ -389,7 +389,7 @@ class QMultipleItemsInputDialog(QDialog):
 					item_text = QListWidgetItem()
 					item_text.setIcon(icon)
 					item_text.setText(text)
-					item_text.setCheckState(Qt.CheckState.Unchecked if text not in items_checked else Qt.CheckState.Checked)
+					item_text.setCheckState(Qt.CheckState.Unchecked if text not in (items_checked or []) else Qt.CheckState.Checked)
 
 					self.list_items.addItem(item_text)
 
@@ -454,7 +454,7 @@ class QItemsInputDialog(QDialog):
 
 
 class QFindReplaceTextDialog(QDialog):
-	def __init__(self,  title, message, text_find: str = "", text_replace: str = "", parent=None):
+	def __init__(self,  title: str, message: str, text_find: str = "", text_replace: str = "", parent = None):
 		super().__init__(parent)
 
 		self.setMinimumWidth(480)
@@ -492,23 +492,23 @@ class QFindReplaceTextDialog(QDialog):
 
 
 class QMultipleTextInputDialog(QDialog):
-	def __init__(self, title, message, items: list[any], parent=None, dictionary : list[str] = []):
+	def __init__(self, title, message, items: list, parent=None, dictionary : list[str] | None = None):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
 		self.setMinimumWidth(480)
 		self.setMinimumHeight(360)
 
-		layout_form    = QFormLayout(self)
+		layout_form               = QFormLayout(self)
 		layout_form.addRow(QLabel(message))
 
-		self.edit_text   = C20_PlainTextEditWithCompleter()
-		self.edit_text.dictionary = dictionary
+		self.edit_text            = C20_PlainTextEditWithCompleter()
+		self.edit_text.dictionary = dictionary or []
 		self.edit_text.setPlainText('\n'.join(items))
 
 		layout_form.addRow(self.edit_text)
 
-		btn_box     = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
+		btn_box                   = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel, Qt.Orientation.Horizontal, self)
 		layout_form.addRow(btn_box)
 
 		btn_box.accepted.connect(self.accept)
@@ -536,9 +536,9 @@ def RequestText(title: str, message: str, old_text: str = "", items: list[str] |
 	return dialog.textValue()
 
 
-def RequestMultipleText(title: str, message: str, old_text: list[str] = [], dictionary: list[str] = []) -> None | list[str]:
+def RequestMultipleText(title: str, message: str, old_text: list[str] | None = None, dictionary: list[str] | None = None) -> None | list[str]:
 	""" Запрос многострочного текста """
-	dialog = QMultipleTextInputDialog(title, message, old_text, None, dictionary)
+	dialog = QMultipleTextInputDialog(title, message, old_text or [], None, dictionary or [])
 	if not dialog.exec_(): return None
 
 	return dialog.textValues()
@@ -600,7 +600,7 @@ def RequestItem(title: str, message: str, items: list[str] | dict[str, QIcon]) -
 	return dialog_items.selectedItem()
 
 
-def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], items_checked: list[str] = []) -> list[str] | None:
+def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], items_checked: list[str] | None = None) -> list[str] | None:
 	""" Запрос значений из списка """
 	if not items               : return None
 	
@@ -614,7 +614,7 @@ def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], 
 	size_h     : int = min(640, len(items) * 55)
 	size_h           = max(240, size_h)
 
-	dialog_items     = QMultipleItemsInputDialog(title, message, items, items_checked=items_checked)
+	dialog_items     = QMultipleItemsInputDialog(title, message, items, items_checked=items_checked or [])
 	dialog_items.resize(size_w, size_h)
 	if not dialog_items.exec_(): return None
 
