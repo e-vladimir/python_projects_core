@@ -365,7 +365,7 @@ def ShowMessage(title: str, message: str, description: str = ""):
 
 # ИНСТРУМЕНТАРИЙ ЗАПРОСОВ
 class QMultipleItemsInputDialog(QDialog):
-	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None, items_checked: list[str] | None = None):
+	def __init__(self,  title, message, items: list[str] | dict[str, QIcon], parent=None, items_checked: list[str] = None):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -492,7 +492,7 @@ class QFindReplaceTextDialog(QDialog):
 
 
 class QMultipleTextInputDialog(QDialog):
-	def __init__(self, title, message, items: list, parent=None, dictionary : list[str] | None = None):
+	def __init__(self, title, message, items: list, parent=None, dictionary : list[str] = None):
 		super().__init__(parent)
 
 		self.setWindowTitle(title)
@@ -519,7 +519,7 @@ class QMultipleTextInputDialog(QDialog):
 		return self.edit_text.toPlainText().split('\n')
 
 
-def RequestText(title: str, message: str, old_text: str = "", items: list[str] | None = None) -> None | str:
+def RequestText(title: str, message: str, old_text: str = "", items: list[str] = None) -> None | str:
 	""" Запрос текста """
 	dialog = QInputDialog(None)
 	dialog.setWindowTitle(title)
@@ -536,7 +536,7 @@ def RequestText(title: str, message: str, old_text: str = "", items: list[str] |
 	return dialog.textValue()
 
 
-def RequestMultipleText(title: str, message: str, old_text: list[str] | None = None, dictionary: list[str] | None = None) -> None | list[str]:
+def RequestMultipleText(title: str, message: str, old_text: list[str] = None, dictionary: list[str] = None) -> None | list[str]:
 	""" Запрос многострочного текста """
 	dialog = QMultipleTextInputDialog(title, message, old_text or [], None, dictionary or [])
 	if not dialog.exec_(): return None
@@ -600,7 +600,7 @@ def RequestItem(title: str, message: str, items: list[str] | dict[str, QIcon]) -
 	return dialog_items.selectedItem()
 
 
-def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], items_checked: list[str] | None = None) -> list[str] | None:
+def RequestItems(title: str, message: str, items: list[str] | dict[str, QIcon], items_checked: list[str] = None) -> list[str] | None:
 	""" Запрос значений из списка """
 	if not items               : return None
 	
@@ -644,7 +644,7 @@ def RequestDirectory(title: str, current_dir: str = "") -> Path | None:
 
 
 # ИНСТРУМЕНТАРИЙ МОДЕЛЕЙ
-def ItemsFromStandardModel(model: QStandardItemModel, parent_item: QStandardItem | None = None) -> list[QStandardItem]:
+def ItemsFromStandardModel(model: QStandardItemModel, parent_item: QStandardItem = None) -> list[QStandardItem]:
 	""" Получение списка элементов  """
 	result : list[QStandardItem] = []
 
@@ -669,7 +669,7 @@ def FindItemFromStandardModelByData(model: QStandardItemModel, text: str, role=Q
 	return None
 
 
-def IndexesFromStandardModel(model: QStandardItemModel, parent_index: QModelIndex | None = None) -> list[QModelIndex]:
+def IndexesFromStandardModel(model: QStandardItemModel, parent_index: QModelIndex = None) -> list[QModelIndex]:
 	""" Список индексов из модели """
 	result : list[QModelIndex] = []
 
