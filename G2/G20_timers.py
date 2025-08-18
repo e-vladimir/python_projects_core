@@ -10,11 +10,11 @@ from   typing import Callable
 class C20_ThreadTimer(threading.Thread):
 	""" Многопоточный таймер """
 
-	def __init__(self, target: Callable, interval_sec: float, flag_enable: bool = False):
+	def __init__(self, target: Callable, interval_ts: float, flag_enable: bool = False):
 		self.Init_00()
 		self.Init_10()
 
-		self.IntervalSec(interval_sec)
+		self.interval = interval_ts
 
 		if flag_enable: self.EnableTimer()
 
@@ -22,33 +22,28 @@ class C20_ThreadTimer(threading.Thread):
 
 		self.start()
 
-	# Служебные уровни инициализации
+	# Модель данных
 	def Init_00(self):
 		self._lock_processing : bool            = True
-		self._interval_sec    : float           = 1.000
+		self._interval_ts     : float           = 1.000
 
 	def Init_10(self):
 		self._target          : Callable | None = None
 
-	# Модель данных
-	pass
+	@property
+	def interval(self) -> float:
+		return self._interval_ts
+	@interval.setter
+	def interval(self, ts: float):
+		self._interval_ts = max(0.001, ts)
 
-	# Модель событий
-	pass
 
-	# Механика данных
-	def IntervalSec(self, value: float = None) -> float:
-		""" Интервал обработки (в секундах) """
-		if value is None: return self._interval_sec
-		else            :        self._interval_sec = value
-
-	def EnableLockProcessing(self):
-		""" Включение блокировки обработки """
-		self._lock_processing = True
-
-	def DisableLockProcessing(self):
-		""" Отключение блокировки обработки """
-		self._lock_processing = False
+	@property
+	def lock_processing(self) -> bool:
+		return self._lock_processing
+	@lock_processing.setter
+	def lock_processing(self, flag: bool):
+		self._lock_processing = flag
 
 	# Механика управления
 	def ControlProcessing(self):
@@ -61,19 +56,21 @@ class C20_ThreadTimer(threading.Thread):
 	# Логика данных
 	def EnableTimer(self):
 		""" Включение таймера """
-		self.DisableLockProcessing()
+		self.lock_processing = False
 
 	def DisableTimer(self):
 		""" Отключение таймера """
-		self.EnableLockProcessing()
+		self.lock_processing = True
 
 	def run(self):
 		while True:
-			time.sleep(self._interval_sec)
+			time.sleep(self._interval_ts)
 
 			self.ControlProcessing()
 
 	# Логика управления
 	def on_RequestProcessing(self):
 		""" Запрос на начало вызова """
+		if self._target is None: return
+
 		self._target()

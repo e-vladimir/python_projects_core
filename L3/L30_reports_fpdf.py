@@ -1,5 +1,5 @@
 # ГЕНЕРАТОР ОТЧЁТОВ НА БАЗЕ FPDF
-# 09 апр 2025
+# 18 авг 2025
 
 import enum
 
@@ -284,18 +284,18 @@ class C30_ProcessorReportsFpdf2(FPDF):
 			                text     = f"{marker} {item}")
 			self.ln(2)
 
-	def AppendTable(self, description: str = "", header: list[str] = [], data: list = [], sizes: list[int] = [], aligns: list[Align] = []):
+	def AppendTable(self, description: str = "", header: list[str] = None, data: list = None, sizes: list[int] = None, aligns: list[Align] = None):
 		""" Добавление таблицы """
 		if not header: return
 		if not data  : return
 
 		self.ln(5)
 
-		column_sizes  : list[float] = [(self.epw - sum(sizes)) / (len(header) - len(sizes))] * len(header)
+		column_sizes  : list[float] = [(self.epw - sum(sizes or [])) / (len(header) - len(sizes or []))] * len(header)
 		column_aligns : list[Align] = [Align.L] * len(header)
 
-		for idx, size  in enumerate(sizes) : column_sizes[idx]  = size
-		for idx, align in enumerate(aligns): column_aligns[idx] = align
+		for idx, size  in enumerate(sizes  or []) : column_sizes[idx]  = size
+		for idx, align in enumerate(aligns or []) : column_aligns[idx] = align
 
 		if description:
 			self.SwitchFont(BLOCKS.DESCRIPTION)

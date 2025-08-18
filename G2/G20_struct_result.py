@@ -5,7 +5,7 @@ from dataclasses      import (dataclass,
                               field)
 from typing           import Any
 
-from G00_status_codes import CODES_COMPLETION, CODES
+from G00_codes_status import CODES_COMPLETION, CODES
 
 
 @dataclass

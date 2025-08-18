@@ -1,0 +1,43 @@
+# МЕТА-КАРКАСЫ
+# 18 авг 2025
+
+
+class C20_MetaFrame:
+	"""  Мета-каркас"""
+	
+	def __init__(self):
+		self.Init_00()
+		self.Init_01()
+		self.Init_10()
+		self.Init_11()
+		self.Init_12()
+		self.Init_20()
+		
+		self.onInited()
+
+	def Init_00(self):
+		""" Инициализация параметров """
+		pass
+
+	def Init_01(self):
+		""" Настройка параметров """
+		pass
+
+	def Init_10(self):
+		""" Инициализация объектов """
+		pass
+
+	def Init_11(self):
+		""" Настройка объектов """
+		pass
+
+	def Init_12(self):
+		""" Обработчик объектов """
+		pass
+
+	def Init_20(self):
+		""" Внутренний обработчик """
+		pass
+
+	# События
+	def onInited(self): pass
