@@ -1,9 +1,9 @@
 # КОНВЕРТАЦИЯ: ДАННЫЕ
-# 18 авг 2025
+# 04 сен 2026
 
 import datetime
 
-from   G10_conversion_format import UTimeToDTime
+from   G10_conversion_formats import UTimeToDTime
 
 
 SEPARATOR_LIST    = ' '
