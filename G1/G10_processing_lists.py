@@ -1,5 +1,5 @@
-# ОБРАБОТКА СПИСКОВ
-# 18 авг 2025
+# ОБРАБОТЧИКИ СПИСКОВ
+# 08 сен 2026
 
 import re
 
@@ -9,7 +9,7 @@ def DistinctAndSortList1D(values: list, flag_distinct: bool = False, flag_sort: 
 	result : list = values[:]
 	if     flag_distinct: result : list = list(set(values))
 
-	if not flag_sort    : return result
+	if not flag_sort: return result
 
 	return list(sorted(result))
 
@@ -23,7 +23,7 @@ def DistinctAndSortList2D(values: list, index_processing_item: int, flag_distinc
 			filter_distinct : set[str] = set(map(lambda item: item[index_processing_item], values))
 			result                     = list(filter(lambda item: item[index_processing_item] in filter_distinct, result))
 
-		if flag_sort        :
+		if flag_sort    :
 			result                     = list(sorted(result, key=lambda item: item[index_processing_item]))
 
 		return result
@@ -35,7 +35,7 @@ def DifferenceLists(list_1: list, list_2: list, flag_cmp_1_to_2: bool = False) -
 	return list(set(list_1 if flag_cmp_1_to_2 else list_2).difference(list_2 if flag_cmp_1_to_2 else list_1))
 
 
-def CleanList(items: list[str], clear_short: bool = True, clear_empty: bool = True, clear_spaces: bool = True, clear_numbers: bool = True, clear_simbols: bool = True, flag_sort: bool = True) -> list[str]:
+def CleaningList(items: list[str], clear_short: bool = True, clear_empty: bool = True, clear_spaces: bool = True, clear_numbers: bool = True, clear_simbols: bool = True, flag_sort: bool = True) -> list[str]:
 	""" Очистка списка от пустых строк, пробелов, чисел, спецсимволов """
 	result = items[:]
 

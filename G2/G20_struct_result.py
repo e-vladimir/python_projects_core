@@ -1,11 +1,11 @@
 # СТРУКТУРНЫЙ РЕЗУЛЬТАТ
-# 18 авг 2024
+# 07 сен 2026
 
 from dataclasses      import (dataclass,
-                              field)
+							  field)
 from typing           import Any
 
-from G00_codes_status import CODES_COMPLETION, CODES
+from G00_status_codes import CODES_COMPLETION, CODES
 
 
 @dataclass

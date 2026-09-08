@@ -43,8 +43,8 @@ class C20_MetaFrame:
 	def onInited(self): pass
 
 
-class C20_SingletonFrame(type):
-	""" Мета-класс singleton для применения через параметр metaclass """
+class C20_MetaSingletonFrame(type):
+	""" Мета-singleton для применения через параметр metaclass """
 
 	_instances = {}
 
