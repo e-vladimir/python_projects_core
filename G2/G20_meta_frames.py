@@ -1,5 +1,5 @@
 # МЕТА-КАРКАСЫ
-# 18 авг 2025
+# 08 сен 2026
 
 
 class C20_MetaFrame:
@@ -41,3 +41,13 @@ class C20_MetaFrame:
 
 	# События
 	def onInited(self): pass
+
+
+class C20_SingletonFrame(type):
+	""" Мета-класс singleton для применения через параметр metaclass """
+
+	_instances = {}
+
+	def __call__(cls, *args, **kwargs):
+		if cls not in cls._instances: cls._instances[cls] = super().__call__(*args, **kwargs)
+		return cls._instances[cls]

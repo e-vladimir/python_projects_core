@@ -1,5 +1,5 @@
 # МЕТА-ОБЪЕКТЫ
-# 18 авг 2025
+# 08 сен 2026
 
 import statistics
 
@@ -10,8 +10,8 @@ class C20_Buffer:
 	""" Мета-буфер """
 	
 	def __init__(self, in_limit: int = 10):
-		self._items :list = []
-		self._limit : int = max(2, in_limit)
+		self._items : list = []
+		self._limit : int  = max(2, in_limit)
 
 	# МОДЕЛЬ ДАННЫХ
 	@property
