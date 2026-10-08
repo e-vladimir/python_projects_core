@@ -1,5 +1,5 @@
 # КОНВЕРТАЦИЯ: ДАННЫЕ
-# 04 сен 2026
+# 08 окт 2026
 
 import datetime
 
@@ -76,9 +76,10 @@ def UTimeToDdDmDyThTmTs(in_utime: int, utc_shift: int | str = None, flag_include
 	""" Конвертация UTime в строковый вид  """
 	dtime  : datetime.datetime = UTimeToDTime(in_utime, utc_shift)
 
-	if in_utime <= 0         : return "Нет данных"
-	elif flag_include_thtmts : return f"{dtime:%d %h %Y %H:%M}"
-	else                     : return f"{dtime:%d %h %Y}"
+	if in_utime <= 0      : return "Нет данных"
+
+	if flag_include_thtmts:	return f"{dtime.day:02d} {MONTHS[dtime.month]} {dtime.year} {dtime.hour:02d}:{dtime.minute:02d}:{dtime.second:02d}"
+	else                  :	return f"{dtime.day:02d} {MONTHS[dtime.month]} {dtime.year}"
 
 
 def UTimeToThTmTs(utime: int, utc_shift: str = "") -> str:
