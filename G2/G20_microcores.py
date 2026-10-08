@@ -80,7 +80,7 @@ class C21_MicroLogger(C20_MetaFrame):
 	pass
 
 	# Механика данных
-	def _AppendEvent(self, level: EVENT_LEVELS = EVENT_LEVELS.INFO, obj: str = "", subj: str = "", event: str = "", details: str | list[str] = ""):
+	def _AppendEvent(self, level: EVENT_LEVELS = EVENT_LEVELS.INFO, obj: str = "", event: str = "", details: str | list[str] = ""):
 		""" Добавление события в журнал """
 		converted_details : str = ""
 		
