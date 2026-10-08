@@ -1,5 +1,5 @@
 # МЕТА-ОБЪЕКТЫ
-# 18 авг 2025
+# 06 окт 2026
 
 from G11_conversion_data import PointToString, StringToPoint
 from G20_meta_frames     import C20_MetaFrame
@@ -12,24 +12,8 @@ class C21_Coordinate2D(C20_MetaFrame):
 	def Init_00(self):
 		super().Init_00()
 		
-		self._x : int = 0
-		self._y : int = 0
-	
-	@property
-	def x(self) -> int:
-		return self._x
-	@x.setter
-	def x(self, value):
-		self._x = value
-
-	
-	@property
-	def y(self) -> int:
-		return self._y
-	@y.setter
-	def y(self, value):
-		self._y = value
-	
+		self.x : int = 0
+		self.y : int = 0
 	
 	@property
 	def xy(self) -> tuple[int, int]:

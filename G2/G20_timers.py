@@ -1,5 +1,5 @@
 # ТАЙМЕРЫ
-# 18 авг 2024
+# 06 окт 2026
 
 import threading
 import time
@@ -24,11 +24,11 @@ class C20_ThreadTimer(threading.Thread):
 
 	# Модель данных
 	def Init_00(self):
-		self._lock_processing : bool            = True
 		self._interval_ts     : float           = 1.000
+		self.lock_processing  : bool            = True
 
 	def Init_10(self):
-		self._target          : Callable | None = None
+		self.Target           : Callable | None = None
 
 	@property
 	def interval(self) -> float:
@@ -38,18 +38,11 @@ class C20_ThreadTimer(threading.Thread):
 		self._interval_ts = max(0.001, ts)
 
 
-	@property
-	def lock_processing(self) -> bool:
-		return self._lock_processing
-	@lock_processing.setter
-	def lock_processing(self, flag: bool):
-		self._lock_processing = flag
-
 	# Механика управления
 	def ControlProcessing(self):
 		""" Контроль обработки """
-		if self._lock_processing: return
-		if self._target is None : return
+		if self.lock_processing: return
+		if self.Target is None : return
 
 		self.on_RequestProcessing()
 
@@ -71,6 +64,6 @@ class C20_ThreadTimer(threading.Thread):
 	# Логика управления
 	def on_RequestProcessing(self):
 		""" Запрос на начало вызова """
-		if self._target is None: return
+		if self.Target is None: return
 
-		self._target()
+		self.Target()

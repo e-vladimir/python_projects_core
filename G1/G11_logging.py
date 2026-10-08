@@ -1,5 +1,5 @@
 # ЖУРНАЛИРОВАНИЕ
-# 18 авг 2025
+# 06 окт 2026
 
 from G10_datetime import CurrentDTime
 
@@ -38,9 +38,3 @@ def LogOk(in_message: str):
 def LogNo(in_message: str):
 	""" Отмена """
 	LogMessage(TYPE_NO, in_message)
-
-
-def LogByStatus(in_type: str, in_message: str):
-	""" Переводит статус сообщения в консольный и выводит сообщение """
-	log_fun = status_translate[in_type]
-	log_fun(in_message)
