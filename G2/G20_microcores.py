@@ -118,9 +118,23 @@ class C21_MicroLogger(C20_MetaFrame):
 		""" Быстрое добавление записи: Ошибка """
 		self._AppendEvent(level=EVENT_LEVELS.ERROR, obj=obj, event=event, details=details)
 
-	# Механика управления
-	pass
+	def Reset(self):
+		""" Очистка журнала """
+		self._events.clear()
 
+	# Механика управления
+	def Print(self, skip_info: bool = False, skip_success: bool = False, skip_warning: bool = False, skip_error: bool = False):
+		for Event in self._events:
+			if skip_info    and Event.level == EVENT_LEVELS.INFO   : continue
+			if skip_success and Event.level == EVENT_LEVELS.SUCCESS: continue
+			if skip_warning and Event.level == EVENT_LEVELS.WARNING: continue
+			if skip_error   and Event.level == EVENT_LEVELS.ERROR  : continue
+			
+			match self.print_mode:
+				case PRINT_MODE.OFF  : return
+				case PRINT_MODE.SHORT: Event.Print(include_object=False)
+				case PRINT_MODE.FULL : Event.Print(include_object=True)
+	
 	# Логика данных
 	pass
 
@@ -132,7 +146,7 @@ MicroLogger = C21_MicroLogger()
 
 
 class C21_MicroConfiguration(C20_MetaFrame):
-	""" Микроядро конфигурации """
+	""" Микроядро микроконфигурации """
 
 	# Модель данных
 	pass
