@@ -1,5 +1,5 @@
 # МИКРОЯДРА
-# 08 окт 2026
+# 09 окт 2026
 
 import enum
 
@@ -13,10 +13,10 @@ from   G20_meta_frames     import C20_MetaFrame
 # КАТАЛОГИ
 class EVENT_LEVELS(enum.Enum):
 	""" Уровни событий """
-	INFO      = ( 0, " ", "")
-	COMPLETED = (10, "+", "Успешно")
-	WARNING   = (20, "!", "Внимание")
-	ERROR     = (30, "E", "Ошибка")
+	INFO    = ( 0, " ", "Информация")
+	SUCCESS = (10, "+", "Успешно")
+	WARNING = (20, "!", "Внимание")
+	ERROR   = (30, "E", "Ошибка")
 	
 	def __init__(self, code: int, symbol: str, description: str):
 		self.code        = code
@@ -26,8 +26,8 @@ class EVENT_LEVELS(enum.Enum):
 
 class PRINT_MODE(enum.IntEnum):
 	""" Режим вывода """
-	OFF   =  0,
-	SHORT = 10,
+	OFF   =  0
+	SHORT = 10
 	FULL  = 20
 	
 
@@ -102,19 +102,19 @@ class C21_MicroLogger(C20_MetaFrame):
 			case PRINT_MODE.SHORT: Event.Print(include_object=False)
 			case PRINT_MODE.FULL : Event.Print(include_object=True)
 
-	def AppendInfo(self, obj: str, event: str, details: str | list[str] = ""):
+	def EventI(self, obj: str, event: str, details: str | list[str] = ""):
 		""" Быстрое добавление записи: Информация """
 		self._AppendEvent(level=EVENT_LEVELS.INFO, obj=obj, event=event, details=details)
 
-	def AppendCompleted(self, obj: str, event: str, details: str | list[str] = ""):
+	def EventS(self, obj: str, event: str, details: str | list[str] = ""):
 		""" Быстрое добавление записи: Успешно """
-		self._AppendEvent(level=EVENT_LEVELS.COMPLETED, obj=obj, event=event, details=details)
+		self._AppendEvent(level=EVENT_LEVELS.SUCCESS, obj=obj, event=event, details=details)
 
-	def AppendWarning(self, obj: str, event: str, details: str | list[str] = ""):
+	def EventW(self, obj: str, event: str, details: str | list[str] = ""):
 		""" Быстрое добавление записи: Предупреждение/Внимание """
 		self._AppendEvent(level=EVENT_LEVELS.WARNING, obj=obj, event=event, details=details)
 
-	def AppendError(self, obj: str, event: str, details: str | list[str] = ""):
+	def EventE(self, obj: str, event: str, details: str | list[str] = ""):
 		""" Быстрое добавление записи: Ошибка """
 		self._AppendEvent(level=EVENT_LEVELS.ERROR, obj=obj, event=event, details=details)
 
