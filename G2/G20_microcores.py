@@ -2,8 +2,10 @@
 # 09 окт 2026
 
 import enum
+import json
 
 from   dataclasses         import dataclass
+from   pathlib             import Path
 
 from   G10_datetime        import CurrentUTime
 from   G11_conversion_data import UTimeToDdDmDyThTmTs
@@ -149,18 +151,71 @@ class C21_MicroConfiguration(C20_MetaFrame):
 	""" Микроядро микроконфигурации """
 
 	# Модель данных
-	pass
+	def Init_00(self):
+		super().Init_00()
+		
+		self._data: dict[str, str] = dict()
 
 	# Модель событий
 	pass
 
 	# Механика данных
-	pass
-
+	def Reset(self):
+		""" Сброс данных """
+		self._data.clear()
+	
 	# Механика управления
 	pass
 
 	# Логика данных
+	def FromFile(self, file_path: Path, file_encoding: str = "utf-8", mode_append: bool = False) -> bool:
+		""" Чтение данных из файла. Формат <field> = <value> """
+		try   :
+			with open(file_path, mode="r", encoding=file_encoding) as raw_file:
+				if not mode_append: self.Reset()
+				
+				for raw_line in raw_file:
+					if '=' not in raw_line: continue
+					
+					field, value = raw_line.split('=', 1)
+					self._data[field.strip()] = value.strip()
+				
+		except Exception: return False
+		
+		return True
+	
+	def ToFile(self, file_path: Path, file_encoding: str = "utf-8") -> bool:
+		""" Запись данных в файл. Формат <field> = <value> """
+		try             :
+			with open(file_path, mode="w", encoding=file_encoding) as file:
+				for item, value in self._data.items(): file.write(f"{item} = {value}\n")
+		except Exception: return False
+		
+		return True
+	
+	def FromJson(self, data: str, mode_append: bool = False) -> bool:
+		""" Чтение данных из JSON строки """
+		if not isinstance(data, str):             return False
+		
+		try   :
+			parsed_data = json.loads(data)
+			
+			if not isinstance(parsed_data, dict): return False
+			
+			if not mode_append: self.Reset()
+			
+			for key, value in parsed_data.items():
+				self._data[str(key)] = str(value)
+			
+			return True
+		except Exception:                         return False
+	
+	def ToJson(self) -> str:
+		""" Сериализация данных в JSON строку """
+		try             : return json.dumps(self._data, ensure_ascii=False, indent=4)
+		except Exception: return ""
+	
+	# Логика управления
 	pass
 
 	# Логика управления
